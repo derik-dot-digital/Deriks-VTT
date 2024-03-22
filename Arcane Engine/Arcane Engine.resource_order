@@ -21,8 +21,10 @@
   "ResourceOrderSettings":[
     {"name":"ImGui_GM","order":1,"path":"extensions/ImGui_GM/ImGui_GM.yy",},
     {"name":"camera","order":1,"path":"objects/camera/camera.yy",},
+    {"name":"grid","order":2,"path":"objects/grid/grid.yy",},
     {"name":"rmExample","order":1,"path":"rooms/rmExample/rmExample.yy",},
     {"name":"ImGui_Misc","order":2,"path":"scripts/ImGui_Misc/ImGui_Misc.yy",},
+    {"name":"shd_grid","order":1,"path":"shaders/shd_grid/shd_grid.yy",},
     {"name":"shdImGui","order":3,"path":"shaders/shdImGui/shdImGui.yy",},
     {"name":"sprExample","order":2,"path":"sprites/sprExample/sprExample.yy",},
     {"name":"sprExample2","order":3,"path":"sprites/sprExample2/sprExample2.yy",},

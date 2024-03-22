@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"gm_revolution",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gm_revolution",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
