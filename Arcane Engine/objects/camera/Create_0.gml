@@ -10,3 +10,6 @@ fov = 60;
 #macro win_h window_get_height()
 znear = 0.1;
 zfar = 100000;
+
+ImGui.__Initialize();
+ImGui.ConfigFlagToggle(ImGuiConfigFlags.DockingEnable);	

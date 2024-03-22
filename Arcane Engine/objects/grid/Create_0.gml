@@ -76,6 +76,11 @@ function vbuff_create_grid(grid_size, tile_size) {
 	
 }
 
+//Function for replacing vbuff with new grid
+function update_grid() {
+vbuff_grid = vbuff_create_grid(grid_size, tile_size);	
+}
+
 //Create Default Grid
 vbuff_grid = vbuff_create_grid(grid_size, tile_size);
 
