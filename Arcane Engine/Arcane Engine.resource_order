@@ -1,8 +1,10 @@
 {
   "FolderOrderSettings":[
     {"name":"Animation Curves","order":12,"path":"folders/Animation Curves.yy",},
+    {"name":"ImGui_Example","order":16,"path":"folders/ImGui_Example.yy",},
     {"name":"Extensions","order":14,"path":"folders/Extensions.yy",},
     {"name":"Fonts","order":7,"path":"folders/Fonts.yy",},
+    {"name":"ImGui_GM","order":17,"path":"folders/ImGui_GM.yy",},
     {"name":"Notes","order":13,"path":"folders/Notes.yy",},
     {"name":"Objects","order":9,"path":"folders/Objects.yy",},
     {"name":"Particle Systems","order":15,"path":"folders/Particle Systems.yy",},
@@ -17,6 +19,12 @@
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings":[
+    {"name":"ImGui_GM","order":1,"path":"extensions/ImGui_GM/ImGui_GM.yy",},
     {"name":"camera","order":1,"path":"objects/camera/camera.yy",},
+    {"name":"rmExample","order":1,"path":"rooms/rmExample/rmExample.yy",},
+    {"name":"ImGui_Misc","order":2,"path":"scripts/ImGui_Misc/ImGui_Misc.yy",},
+    {"name":"shdImGui","order":3,"path":"shaders/shdImGui/shdImGui.yy",},
+    {"name":"sprExample","order":2,"path":"sprites/sprExample/sprExample.yy",},
+    {"name":"sprExample2","order":3,"path":"sprites/sprExample2/sprExample2.yy",},
   ],
 }
