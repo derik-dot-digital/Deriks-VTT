@@ -1,9 +1,9 @@
 {
   "FolderOrderSettings":[
     {"name":"Animation Curves","order":12,"path":"folders/Animation Curves.yy",},
-    {"name":"ImGui_Example","order":16,"path":"folders/ImGui_Example.yy",},
     {"name":"Extensions","order":14,"path":"folders/Extensions.yy",},
     {"name":"Fonts","order":7,"path":"folders/Fonts.yy",},
+    {"name":"ImGui_Example","order":16,"path":"folders/ImGui_Example.yy",},
     {"name":"ImGui_GM","order":17,"path":"folders/ImGui_GM.yy",},
     {"name":"Notes","order":13,"path":"folders/Notes.yy",},
     {"name":"Objects","order":9,"path":"folders/Objects.yy",},
@@ -23,6 +23,7 @@
     {"name":"camera","order":1,"path":"objects/camera/camera.yy",},
     {"name":"grid","order":2,"path":"objects/grid/grid.yy",},
     {"name":"rmExample","order":1,"path":"rooms/rmExample/rmExample.yy",},
+    {"name":"matrix_orthogonalize","order":1,"path":"scripts/matrix_orthogonalize/matrix_orthogonalize.yy",},
     {"name":"ImGui_Misc","order":2,"path":"scripts/ImGui_Misc/ImGui_Misc.yy",},
     {"name":"shd_grid","order":1,"path":"shaders/shd_grid/shd_grid.yy",},
     {"name":"shdImGui","order":3,"path":"shaders/shdImGui/shdImGui.yy",},

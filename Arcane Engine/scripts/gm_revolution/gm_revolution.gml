@@ -1,5 +1,5 @@
-///Returns a struct containing x and y
-function vec2(x, y) constructor {
+ ///Returns a struct containing x and y
+function vec2(x = 0, y = 0) constructor {
 	self.x = x;
 	self.y = y;
 
@@ -24,8 +24,10 @@ function vec2(x, y) constructor {
 	//Returns the length of this vector
 	static Magnitude = function() {
 		gml_pragma("forceinline");
-		return sqrt(self.x * self.x + self.y * self.y);
-	};
+		var _in = self.x * self.x + self.y * self.y;
+		if _in = 0 or is_nan(_in) {return 0;}
+		return sqrt(_in);
+	}
 	
 	//Returns the squared length of this vector
 	static SqrMagnitude = function() {
@@ -34,10 +36,14 @@ function vec2(x, y) constructor {
 	}
 	
 	//Returns this vector with a magnitude of 1
-	static Normalized = function() {
+	static Normalize = function() {
 		gml_pragma("forceinline");
 		var l = 1.0 / self.Magnitude();
+		if is_numeric(l){
 		return new vec2(self.x * l, self.y * l);
+		} else {
+		return new vec2(0, 0);	
+		}
 	}
 	
 	//Returns the vector rotated by the amount supplied in degrees.
@@ -63,6 +69,7 @@ function vec2(x, y) constructor {
 	static ClampedMagnitude = function(max_magnitude) {
 		gml_pragma("forceinline");
 		var l = self.Magnitude();
+		if !is_numeric(l) or l = 0 {return new vec2(0, 0, 0);}
 		var vec = self;
 		if (l > 0 && max_magnitude < l) {
 			vec.x /= l;
@@ -94,7 +101,7 @@ function vec2(x, y) constructor {
 	//Multiply two vectors
 	static Mul = function(vec) {
 		gml_pragma("forceinline");
-		return new vec2(self.x*vector2.x, self.y*vector2.y);
+		return new vec2(self.x*vec.x, self.y*vec.y);
 	}
 	
 	//Divide with another vector
@@ -219,16 +226,21 @@ function vec2(x, y) constructor {
 		return max(self.x, self.y);
 	}
 	
-	///Returns the lowest value of the vector
+	//Returns the lowest value of the vector
 	static MinComponent = function() {
 		gml_pragma("forceinline");
 		return min(self.x, self.y);
+	}
+
+	//Returns the vector as a vec3
+	static AsVec3 = function(_z = 0) {
+	return new vec3(self.x, self.y, _z);	
 	}
 	
 }
 
 ///Returns a struct containing x, y, and z
-function vec3(x, y, z) constructor {
+function vec3(x = 0, y = 0, z = 0) constructor {
 	self.x = x;
 	self.y = y;
 	self.z = z;
@@ -254,7 +266,9 @@ function vec3(x, y, z) constructor {
 	//Returns the length of this vector
 	static Magnitude = function() {
 		gml_pragma("forceinline");
-		return sqrt(self.x * self.x + self.y * self.y + self.z * self.z);
+		var _in = self.x * self.x + self.y * self.y + self.z * self.z;
+		if _in = 0 or is_nan(_in) {return 0;}
+		return sqrt(_in);
 	}
 	
 	//Returns the squared length of this vector
@@ -266,8 +280,16 @@ function vec3(x, y, z) constructor {
 	//Returns this vector with a magnitude of 1
 	static Normalize = function() {
 		gml_pragma("forceinline");
-		var l = 1.0 / self.Magnitude();
-		return new vec3(self.x * l, self.y * l,	self.z * l);
+		var mag = self.Magnitude();
+		if (mag == 0) {
+		return self; // Return the original vector if the magnitude is zero
+		}
+		var l = 1.0 / mag;
+		if is_numeric(l){
+		return new vec3(self.x * l, self.y * l, self.z * l);
+		} else {
+		return new vec3(0, 0, 0);	
+		}
 	}
 	
 	//Returns the vector snapped in a grid
@@ -416,6 +438,14 @@ function vec3(x, y, z) constructor {
 		gml_pragma("forceinline");
 		return new vec3(lerp(self.x, vec.x, amt), lerp(self.y, vec.y, amt), lerp(self.z, vec.z, amt));
 	}
+
+	//Slerp function for interpolating between two vectors
+	static Slerp = function(vec, t) {
+	    var dot = self.Dot(vec);
+	    var theta = arccos(clamp(dot, -1, 1)) * t;
+	    var v2 = vec.Sub(self.Mul(dot)).Normalize();
+	    return self.Mul(cos(theta)).Add(v2.Mul(sin(theta)));
+	}
 	
 	//Returns the distance between the two vectors
 	static Distance = function(vec) {
@@ -495,7 +525,7 @@ function vec3(x, y, z) constructor {
 		var d = (1 - c) * self.Dot(a);
 		return self.Mul(c).Add(a.Mul(d)).Add(a.Cross(self).Mul(s));
 	}
-
+	
 	//Returns the vector multiplied by a matrix
 	static MulMatrix = function(m) {
 		gml_pragma("forceinline");
@@ -522,10 +552,30 @@ function vec3(x, y, z) constructor {
 		return new quat(qx, qy, qz, qw);
 	}
 	
+	//Returns the vector with each component remaped and clamped to be between 0 & 1
+	static ColortoShader = function() {
+		gml_pragma("forceinline");
+		var min_vec = new vec3(0.0, 0.0, 0.0);
+		var max_vec = new vec3(1.0, 1.0, 1.0);
+		return self.Div(255).Clamped(min_vec, max_vec);
+	}
+
+	//Returns the vector interpolated towards another 
+	static ColorBlend = function(col, amt) {
+		gml_pragma("forceinline");
+		return self.Lerp(col, amt);
+	}
+	
+	//Returns the vector as a Vec4
+	static AsVec4 = function(w) {
+	gml_pragma("forceinline");
+	return new vec4(self.x, self.y, self.z, w);	
+	}
+	
 }
 
 //Returns a struct containing x, y, z, and w
-function vec4(x, y, z, w) constructor {
+function vec4(x = 0, y = 0, z = 0, w = 0) constructor {
     self.x = x;
     self.y = y;
     self.z = z;
@@ -665,11 +715,21 @@ function vec4(x, y, z, w) constructor {
             self.x, self.y, self.z, 1
         ];
     }
-		
+
+	//Lerps one vector towards another by an amount
+	static Lerp = function(vec, amt) {
+		gml_pragma("forceinline");
+		return new vec4(lerp(self.x, vec.x, amt), lerp(self.y, vec.y, amt), lerp(self.z, vec.z, amt), lerp(self.w, vec.w, amt));
+	}
+	
 }
 
+//Returns a struct containing x, y, z and w.
+
+
+/*
 //Returns a struct containing x, y, z, and w
-function quat(x = 0.00001, y = 0, z = 0, w = 1) constructor {
+function quat(x = 0, y = 0, z = 0, w = 1) constructor {
     self.x = x;
     self.y = y;
     self.z = z;
@@ -684,6 +744,9 @@ function quat(x = 0.00001, y = 0, z = 0, w = 1) constructor {
 	// Multiply two quaternion and combine two rotation together.
     static Mul = function(val) {
 		gml_pragma("forceinline");
+		if (is_numeric(val)) {
+            return new quat(self.x * val, self.y * val, self.z * val, self.w * val);
+        }
 		var qx = self.w * val.x + self.x * val.w + self.y * val.z - self.z * val.y;
 		var qy = self.w * val.y + self.y * val.w + self.z * val.x - self.x * val.z;
 		var qz = self.w * val.z + self.z * val.w + self.x * val.y - self.y * val.x;
@@ -699,13 +762,21 @@ function quat(x = 0.00001, y = 0, z = 0, w = 1) constructor {
 		var qy = 2*self.x*self.y*vec.x + self.y*self.y*vec.y + 2*self.z*self.y*vec.z + 2*self.w*self.z*vec.x - self.z*self.z*vec.y + self.w*self.w*vec.y - 2*self.x*self.w*vec.z - self.x*self.x*vec.y;
 		var qz = 2*self.x*self.z*vec.x + 2*self.y*self.z*vec.y + self.z*self.z*vec.z - 2*self.w*self.y*vec.x - self.y*self.y*vec.z + 2*self.w*self.x*vec.y - self.x*self.x*vec.z + self.w*self.w*vec.z;
 		return new vec3(qx, qy, qz);
+		//var uv, uuv;
+		//var qvec = new vec3(self.x, self.y, self.z);
+		//uv = qvec.Cross(vec);
+		//uuv = qvec.Cross(uv);
+		//uv = uv.Mul(2.0 * self.w);
+		//uuv = uuv.Mul(2.0);
+		//return vec.Add(uv).Add(uuv);
 	}
 
 	// Rotate a quaternion around it's local axis.
 	static RotateVec3 = function(vec) {
-		gml_pragma("forceinline");
-		var vec_quat = vec.Quat();
-		return self.Mul(vec_quat);
+	    gml_pragma("forceinline");
+	    var vec_quat = new quat(vec.x, vec.y, vec.z, 0); // Convert vector to quaternion
+	    var result_quat = self.Mul(vec_quat).Mul(self.Conjugate()); // Rotate and then apply conjugate
+	    return new vec3(result_quat.x, result_quat.y, result_quat.z); // Return the resulting vector
 	}
 
 	//	Return the conjugate of a quaternion 
@@ -724,6 +795,18 @@ function quat(x = 0.00001, y = 0, z = 0, w = 1) constructor {
 	static Dot = function(val) {
 		gml_pragma("forceinline");
 		 return self.x*val.x + self.y*val.y + self.z*val.z + self.w*val.w;
+	}
+
+	//Add two quaternions 
+	static Add = function(val) {
+	    gml_pragma("forceinline");
+	    return new quat(self.x + val.x, self.y + val.y, self.z + val.z, self.w + val.w);
+	}
+
+	//Subtract two quaternions 
+	static Sub = function(val) {
+	    gml_pragma("forceinline");
+	    return new quat(self.x - val.x, self.y - val.y, self.z - val.z, self.w - val.w);
 	}
 
 	//Returns the quaternion negated
@@ -759,7 +842,7 @@ function quat(x = 0.00001, y = 0, z = 0, w = 1) constructor {
 	}
 
 	//Normalized Quaternion Lerp (you generally want to use this)
-	static Nlerp = function(val ,t) {
+	static Nlerp = function(val, t) {
 		gml_pragma("forceinline");
 		var lq = self.Lerp(val, t);
 		lq = lq.Normalize();
@@ -768,36 +851,109 @@ function quat(x = 0.00001, y = 0, z = 0, w = 1) constructor {
 
 	//Returns the quaternion, position, and scale as a matrix array
 	static AsMatrix = function(pos_vec, scale_vec) {
-		gml_pragma("forceinline");
-		var mat = array_create(16,0);
-		var sqw = _quat.w*_quat.w;
-		var sqx = _quat.x*_quat.x;
-		var sqy = _quat.y*_quat.y;
-		var sqz = _quat.z*_quat.z;
-		mat[@0] = (sqx - sqy - sqz + sqw) * scale_vec.x; // since sqw + sqx + sqy + sqz =1
-		mat[@5] = (-sqx + sqy - sqz + sqw) * scale_vec.y;
-		mat[@10] = (-sqx - sqy + sqz + sqw) * scale_vec.z;
-   
-		var tmp1 = _quat.x*_quat.y;
-		var tmp2 = _quat.z*_quat.w;
-		mat[@1] = 2.0 * (tmp1 + tmp2) * scale_vec.x;
-		mat[@4] = 2.0 * (tmp1 - tmp2) * scale_vec.y;
-   
-		tmp1 = _quat.x*_quat.z;
-		tmp2 = _quat.y*_quat.w;
-		mat[@2] = 2.0 * (tmp1 - tmp2) * scale_vec.x;
-		mat[@8] = 2.0 * (tmp1 + tmp2) * scale_vec.z;
-   
-		tmp1 = _quat.y*_quat.z;
-		tmp2 = _quat.x*_quat.w;
-		mat[@6] = 2.0 * (tmp1 + tmp2) * scale_vec.y;
-		mat[@9] = 2.0 * (tmp1 - tmp2) * scale_vec.z;
-	
-		mat[@12] = pos_vec.x;
-		mat[@13] = pos_vec.y;
-		mat[@14] = pos_vec.z;
-		mat[@15] = 1.0;
-		return mat;
+	    gml_pragma("forceinline");
+	    var mat = array_create(16,0);
+	    var sqw = self.w*self.w;
+	    var sqx = self.x*self.x;
+	    var sqy = self.y*self.y;
+	    var sqz = self.z*self.z;
+	    mat[@0] = (sqx - sqy - sqz + sqw) * scale_vec.x; // since sqw + sqx + sqy + sqz =1
+	    mat[@5] = (-sqx + sqy - sqz + sqw) * scale_vec.y;
+	    mat[@10] = (-sqx - sqy + sqz + sqw) * scale_vec.z;
+
+	    var tmp1 = self.x*self.y;
+	    var tmp2 = self.z*self.w;
+	    mat[@1] = 2.0 * (tmp1 + tmp2) * scale_vec.y;
+	    mat[@4] = 2.0 * (tmp1 - tmp2) * scale_vec.x;
+
+	    tmp1 = self.x*self.z;
+	    tmp2 = self.y*self.w;
+	    mat[@2] = 2.0 * (tmp1 - tmp2) * scale_vec.z;
+	    mat[@8] = 2.0 * (tmp1 + tmp2) * scale_vec.x;
+
+	    tmp1 = self.y*self.z;
+	    tmp2 = self.x*self.w;
+	    mat[@6] = 2.0 * (tmp1 + tmp2) * scale_vec.z;
+	    mat[@9] = 2.0 * (tmp1 - tmp2) * scale_vec.y;
+
+	    mat[@12] = pos_vec.x;
+	    mat[@13] = pos_vec.y;
+	    mat[@14] = pos_vec.z;
+	    mat[@15] = 1.0;
+	    return mat;
 	}
 
+
+
+	//Interpolates the quaternion towards another with spring-like motion and velocity
+	//Returns updated values as linear array: [rotation_quat, velocity_quat, difference_quat, acceleration_quat];
+	//The updated rotation and velocity quaternions need to be stored to allow for continuity in the next update.
+	static UpdateSpring = function(goal_quat, velocity_quat, stiffness, damping, t) {
+		gml_pragma("forceinline");
+	    var q = self;
+	    var goal = goal_quat;
+	    var vel = velocity_quat;
+	    var quat_dif = goal.Mul(q.Conjugate());
+	    var acceleration = quat_dif.Mul(stiffness).Sub(vel.Mul(damping));
+	    vel = vel.Add(acceleration.Mul(t));
+	    q = vel.Mul(t).Add(new quat(0, 0, 0, 1)).Mul(q);
+	    q = q.Normalize();
+		return [q, vel, quat_dif, acceleration];
+	}
+
+	//Returns the x, y, and z components as a vec3
+	static AsVec3 = function() {
+		gml_pragma("forceinline");
+		return new vec3(self.x, self.y, self.z);
+	}
+
+	//Returns the x, y, z, and w compents as a vec4
+	static AsVec4 = function() {
+		gml_pragma("forceinline");
+		return new vec4(self.x, self.y, self.z, self.w);
+	}
+	
+	//Spherical Linear Interpolation that maintains constant angular velocity, where Nlerp does not.
+	static Slerp = function(q, t) {
+		gml_pragma("forceinline");
+		var qm = new quat();
+		var cosHalfTheta = self.w * q.w + self.x * q.x + self.y * q.y + self.z * q.z;
+		if (abs(cosHalfTheta) >= 1.0) {
+			qm.w = self.w;
+			qm.x = self.x;
+			qm.y = self.y;
+			qm.z = self.z;
+			return qm;
+		}
+		var halfTheta = arccos(cosHalfTheta);
+		var sinHalfTheta = sqrt(1.0 - cosHalfTheta*cosHalfTheta);
+		if (abs(sinHalfTheta) < 0.001) {
+			qm.w = (self.w * 0.5 + q.w * 0.5);
+			qm.x = (self.x * 0.5 + q.x * 0.5);
+			qm.y = (self.y * 0.5 + q.y * 0.5);
+			qm.z = (self.z * 0.5 + q.z * 0.5);
+			return qm;
+		}
+		var ratioA = sin((1 - t) * halfTheta) / sinHalfTheta;
+		var ratioB = sin(t * halfTheta) / sinHalfTheta; 
+		qm.w = (self.w * ratioA + q.w * ratioB);
+		qm.x = (self.x * ratioA + q.x * ratioB);
+		qm.y = (self.y * ratioA + q.y * ratioB);
+		qm.z = (self.z * ratioA + q.z * ratioB);
+		return qm;
+	}
+
+	//Returns true if the given quaternion is exactly equal to this quaternion
+    static Equals = function(q) {
+		gml_pragma("forceinline");
+        return (self.x == q.x) && (self.y == q.y) && (self.z == q.z) && (self.w == q.w);
+    }
+
+	//Overwrites the quaternion with a new one generated from angle axis
+	static FromAngleAxis = function(angle, axis) {
+	    gml_pragma("forceinline");
+	    var halfAngle = angle * 0.5;
+	    var s = sin(halfAngle);
+	    return new quat(axis.x * s, axis.y * s, axis.z * s, cos(halfAngle));
+	}
 }
