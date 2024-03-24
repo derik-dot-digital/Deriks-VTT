@@ -46,3 +46,10 @@ if (ImGui.BeginMenu("Options")) {
 }
 
 #endregion
+
+//var cam_rot = new quat().FromAngleAxis(up, 0.01);
+//view_quat = view_quat.Mul(cam_rot);.
+
+//pos = target.Add(new vec3(lengthdir_x(-200, current_time/100), lengthdir_y(-200, current_time/100), 100));
+//dir = pos.Sub(target).Normalize();
+//view_quat = new quat().FromLookRotation(dir, up).Normalize();

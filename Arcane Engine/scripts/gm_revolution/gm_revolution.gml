@@ -69,7 +69,7 @@ function vec2(x = 0, y = 0) constructor {
 	static ClampedMagnitude = function(max_magnitude) {
 		gml_pragma("forceinline");
 		var l = self.Magnitude();
-		if !is_numeric(l) or l = 0 {return new vec2(0, 0, 0);}
+		if !is_numeric(l) or l = 0 {return new vec2(0, 0);}
 		var vec = self;
 		if (l > 0 && max_magnitude < l) {
 			vec.x /= l;
@@ -722,135 +722,433 @@ function vec4(x = 0, y = 0, z = 0, w = 0) constructor {
 		return new vec4(lerp(self.x, vec.x, amt), lerp(self.y, vec.y, amt), lerp(self.z, vec.z, amt), lerp(self.w, vec.w, amt));
 	}
 	
+	//Returns the vector as a quat
+	static AsQuat = function() {
+		gml_pragma("forceinline");
+		return new quat(self.x, self.y, self.z, self.w);	
+	}
+	
 }
 
 //Returns a struct containing x, y, z and w.
-
-
-/*
-//Returns a struct containing x, y, z, and w
 function quat(x = 0, y = 0, z = 0, w = 1) constructor {
     self.x = x;
     self.y = y;
     self.z = z;
 	self.w = w;
-
+	
 	//Returns the struct type as a string
 	static Type = function() {
 		gml_pragma("forceinline");
 		return "quat";	
 	}
 	
-	// Multiply two quaternion and combine two rotation together.
-    static Mul = function(val) {
-		gml_pragma("forceinline");
-		if (is_numeric(val)) {
-            return new quat(self.x * val, self.y * val, self.z * val, self.w * val);
-        }
-		var qx = self.w * val.x + self.x * val.w + self.y * val.z - self.z * val.y;
-		var qy = self.w * val.y + self.y * val.w + self.z * val.x - self.x * val.z;
-		var qz = self.w * val.z + self.z * val.w + self.x * val.y - self.y * val.x;
-		var qw = self.w * val.w - self.x * val.x - self.y * val.y - self.z * val.z;
-		return new quat(qx, qy, qz, qw);
-	}
-
-	// Rotate a vector by a quaternion angle
-	// https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/transforms/index.html
-	static TransformVec3 = function(vec) {
-		gml_pragma("forceinline");
-		var qx = self.w*self.w*vec.x + 2*self.w*self.w*vec.z - 2*self.z*self.w*vec.y + self.x*self.x*vec.x + 2*self.y*self.x*vec.y + 2*self.z*self.x*vec.z - self.z*self.z*vec.x - self.y*self.y*vec.x;
-		var qy = 2*self.x*self.y*vec.x + self.y*self.y*vec.y + 2*self.z*self.y*vec.z + 2*self.w*self.z*vec.x - self.z*self.z*vec.y + self.w*self.w*vec.y - 2*self.x*self.w*vec.z - self.x*self.x*vec.y;
-		var qz = 2*self.x*self.z*vec.x + 2*self.y*self.z*vec.y + self.z*self.z*vec.z - 2*self.w*self.y*vec.x - self.y*self.y*vec.z + 2*self.w*self.x*vec.y - self.x*self.x*vec.z + self.w*self.w*vec.z;
-		return new vec3(qx, qy, qz);
-		//var uv, uuv;
-		//var qvec = new vec3(self.x, self.y, self.z);
-		//uv = qvec.Cross(vec);
-		//uuv = qvec.Cross(uv);
-		//uv = uv.Mul(2.0 * self.w);
-		//uuv = uuv.Mul(2.0);
-		//return vec.Add(uv).Add(uuv);
-	}
-
-	// Rotate a quaternion around it's local axis.
-	static RotateVec3 = function(vec) {
-	    gml_pragma("forceinline");
-	    var vec_quat = new quat(vec.x, vec.y, vec.z, 0); // Convert vector to quaternion
-	    var result_quat = self.Mul(vec_quat).Mul(self.Conjugate()); // Rotate and then apply conjugate
-	    return new vec3(result_quat.x, result_quat.y, result_quat.z); // Return the resulting vector
-	}
-
-	//	Return the conjugate of a quaternion 
-	static Conjugate = function () {
-		gml_pragma("forceinline");
-		return new quat(-self.x, -self.y, -self.z, self.w);
-	}
-
-	//	Same thing as quaternion conjugate, in case you don't know...
-	static Inverse = function () {
-		gml_pragma("forceinline");
-		return self.Conjugate();
+	//Returns the quaternion as Radians stored in a vec3 (assumes the quat is normalized)
+	static ToAngleAxis = function() {
+		gml_pragma("forceinline");			
+		var angles = new vec3(0, 0, 0);
+	    var sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+	    var cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+	    angles.x = arctan2(sinr_cosp, cosr_cosp);
+	    var sinp = sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
+	    var cosp = sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
+	    angles.y = 2 * arctan2(sinp, cosp) - M_PI / 2;
+	    var siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+	    var cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+	    angles.z= arctan2(siny_cosp, cosy_cosp);
+		return angles;
 	}
 	
-	//Returns the dot product of two quaternions
-	static Dot = function(val) {
-		gml_pragma("forceinline");
-		 return self.x*val.x + self.y*val.y + self.z*val.z + self.w*val.w;
-	}
-
-	//Add two quaternions 
-	static Add = function(val) {
-	    gml_pragma("forceinline");
-	    return new quat(self.x + val.x, self.y + val.y, self.z + val.z, self.w + val.w);
-	}
-
-	//Subtract two quaternions 
-	static Sub = function(val) {
-	    gml_pragma("forceinline");
-	    return new quat(self.x - val.x, self.y - val.y, self.z - val.z, self.w - val.w);
-	}
-
-	//Returns the quaternion negated
-	static Negate = function() {
-		gml_pragma("forceinline");
-		return new quat(-self.x, -self.y, -self.z, -self.w);
+	//Returns the quaternion as Euler angles in Degrees stored in a vec3 (assumes the quat is normalized)
+	static ToEulerAngles = function() {
+		gml_pragma("forceinline");		
+		var euler_conv = self.ToAngleAxis();
+		var result = new vec3(radtodeg(euler_conv.x), radtodeg(euler_conv.y), radtodeg(euler_conv.z));
+		return result;
 	}
 
 	//Returns the quaternion normalized
 	static Normalize = function() {
 		gml_pragma("forceinline");
-		var l = 1 / sqrt(self.Dot(self));
+		var l = 1 / self.Magnitude();
 		return new quat(l*self.x, l*self.y, l*self.z, l*self.w);
 	}
+	
+	//Returns the dot product between two quaternions
+	static Dot = function(q) {
+		gml_pragma("forceinline");
+		return self.x * q.x + self.y * q.y + self.x * q.z + self.w * q.w;	
+	}
+	
+	//Returns the angle between two rotations as radians or degrees
+	static Angle = function(q, as_degrees) {
+		gml_pragma("forceinline");
+		var dot = min(abs(self.Dot(q)), 1.0);
+		var result = self.IsEqualUsingDot(q) ? 0.0 : arccos(dot) * 2.0;
+		if as_degrees {result = radtodeg(result);}
+		return  result;
+	}
 
-	//Regular Quaternion Lerp
-	static Lerp = function (val, t) {
+	//Returns a quaternion representing a rotation around a unit axis by an angle in radians.
+    static FromAngleAxis = function(axis, angle) {
+		gml_pragma("forceinline");
+        var sina = sin(0.5 * angle);
+		var cosa = cos(0.5 * angle);
+        return new quat(axis.x * sina, axis.y * sina, axis.z * sina, cosa);
+    }
+
+	//Returns a quaternion representing the vec3 of rotations in Degrees
+	static FromEulerAngles = function(vec)
+	{	
+		gml_pragma("forceinline");
+	    var cr = dcos(vec.x * 0.5);
+	    var sr = dsin(vec.x * 0.5);
+	    var cp = dcos(vec.y * 0.5);
+	    var sp = dsin(vec.y * 0.5);
+	    var cy = dcos(vec.z * 0.5);
+	    var sy = dsin(vec.z * 0.5);
+		var q = new quat();
+	    q.x = sr * cp * cy - cr * sp * sy;
+	    q.y = cr * sp * cy + sr * cp * sy;
+	    q.z = cr * cp * sy - sr * sp * cy;
+	    q.w = cr * cp * cy + sr * sp * sy;
+	    return q;
+	}
+
+    //Is the dot product of two quaternions within tolerance for them to be considered equal?
+	static IsEqualUsingDot = function(q) {
+		gml_pragma("forceinline");
+		var dot = self.Dot(q);
+		var kEpsilon = 0.000001;
+		return bool(dot > 1.0 - kEpsilon);
+	}
+
+    //Compare to the quaternion to another to see if its equal
+	static IsEqual = function(q) {
+		gml_pragma("forceinline");
+		var kEpsilon = 0.000001;
+		return bool(self.Dot(q) > 1.0 - kEpsilon);
+	}
+
+	//Returns true if the given quaternion is exactly equal to this quaternion
+    static Equals = function(q) {
+		gml_pragma("forceinline");
+        return (self.x == q.x) && (self.y == q.y) && (self.z == q.z) && (self.w == q.w);
+    }
+	
+	//Returns the quaternion rotated towards another quaternion by an amount in radians
+	static RotateTowards = function(q, t) {
+		gml_pragma("forceinline");
+		var num = self.Angle(q, false);
+	    if (num == 0)
+	    {
+	        return q;
+	    }
+	    var tt = min(1, t / num);
+	    return self.SlerpUnclamped(q, tt);
+	}	
+
+	//Returns the quaternion spherically interpolated towards another quaternion by the provided unclamped amount.
+	static SlerpUnclamped = function(q, t) {
+		gml_pragma("forceinline");
+        if (self.MagnitudeSquared() == 0.0)
+        {
+            if (q.MagnitudeSquared() == 0.0)
+            {
+                return new quat();
+            }
+            return q;
+        }
+        else if (q.MagnitudeSquared() == 0.0)
+        {
+            return self;
+        }
+		
+		var veca = new vec3(self.x, self.y, self.z);
+		var vecb = new vec3(q.x, q.y, q.z);
+        var cosHalfAngle = self.w * q.w + veca.Dot(vecb);
+
+        if (cosHalfAngle >= 1.0 || cosHalfAngle <= -1.0)
+        {
+            // angle = 0.0, so just return one input.
+            return self;
+        }
+        else if (cosHalfAngle < 0.0)
+        {
+			var b = q;
+			b.x =  -b.x;
+			b.y = -b.y;
+			b.z = -b.z;
+            b.w = -b.w;
+            cosHalfAngle = -cosHalfAngle;
+        }
+
+        var blendA;
+        var blendB;
+        if (cosHalfAngle < 0.99)
+        {
+            // do proper slerp for big angles
+            var halfAngle = arccos(cosHalfAngle);
+            var sinHalfAngle = sin(halfAngle);
+            var oneOverSinHalfAngle = 1.0 / sinHalfAngle;
+            blendA = sin(halfAngle * (1.0 - t)) * oneOverSinHalfAngle;
+            blendB = sin(halfAngle * t) * oneOverSinHalfAngle;
+        }
+        else
+        {
+            // do lerp if angle is really small.
+            blendA = 1.0 - t;
+            blendB = t;
+        }
+
+		var qx = blendA * self.x + blendB * q.x;
+		var qy = blendA * self.y + blendB * q.y;
+		var qz = blendA * self.z + blendB * q.z;
+		var qw = blendA * self.w + blendB * q.w
+		
+        var result = new quat(qx, qy, qz, qw);
+        if (result.MagnitudeSquared() > 0.0)
+            return result.Normalize();
+        else
+            return new quat();
+    }
+
+	//Returns the quaternion spherically interpolated towards another quaternion by the provided amount
+	static Slerp = function(q, t) {
+		gml_pragma("forceinline");
+		var dt = self.dot(q);
+		var q2 = q;
+		if (dt < 0.0)
+		{
+		dt = -dt;
+		q2 = q2.Conjugate();
+		}
+
+		if (dt < 0.9995)
+		{
+		var angle = acos(dt);
+		var s = 1 / sqrt(1.0 - dt * dt);    // 1.0f / sin(angle)
+		var w1 = sin(angle * (1.0 - t)) * s;
+		var w2 = sin(angle * t) * s;
+		var result = self.Scale(w1).Add(q2.Scale(w2));
+		return result;
+		}
+		else
+		{
+		// if the angle is small, use linear interpolation
+		return self.Nlerp(q2, t);
+		}	
+	}
+	
+    //Returns the Magnitude of the quaternion
+    static Magnitude = function() {
+		gml_pragma("forceinline");
+        return sqrt(self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w);
+    }
+
+    //Returns the Squared Magnitude of the quaternion
+    static MagnitudeSquared = function() {
+		gml_pragma("forceinline");
+        return self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w;
+    }
+	
+    //Returns the Inverse of quaternion
+    static Inverse = function() {
+		gml_pragma("forceinline");
+        var lengthSq = self.MagnitudeSquared();
+        if (lengthSq != 0.0)
+        {
+            var i = 1.0 / lengthSq;
+			return new quat(self.x * -i, self.y * -i, self.z * -i, self.w * i);
+        }
+        return self;
+    }
+
+	//Returns the Conjugate of the quaternion
+	static Conjugate = function() {
+		gml_pragma("forceinline");
+		return new quat(-self.x, -self.y, -self.z, self.w);
+	}
+  
+	//Returns a quaternion generated from a specified forward and upward vector
+	static FromLookRotation = function(forward_vec, up_vec) {
+		gml_pragma("forceinline");
+		var forward = forward_vec.Normalize();
+        var right = up_vec.Cross(forward).Normalize();
+        var up = forward.Cross(right);
+        var m00 = right.x;
+        var m01 = right.y;
+        var m02 = right.z;
+        var m10 = up.x;
+        var m11 = up.y;
+        var m12 = up.z;
+        var m20 = forward.x;
+        var m21 = forward.y;
+        var m22 = forward.z;
+		
+        var num8 = (m00 + m11) + m22;
+        var quaternion = new quat();
+        if (num8 > 0)
+        {
+            var num = sqrt(num8 + 1);
+            quaternion.w = num * 0.5;
+            num = 0.5 / num;
+            quaternion.x = (m12 - m21) * num;
+            quaternion.y = (m20 - m02) * num;
+            quaternion.z = (m01 - m10) * num;
+            return quaternion;
+        }
+        if ((m00 >= m11) && (m00 >= m22))
+        {
+            var num7 = sqrt(((1 + m00) - m11) - m22);
+            var num4 = 0.5 / num7;
+            quaternion.x = 0.5 * num7;
+            quaternion.y = (m01 + m10) * num4;
+            quaternion.z = (m02 + m20) * num4;
+            quaternion.w = (m12 - m21) * num4;
+            return quaternion;
+        }
+        if (m11 > m22)
+        {
+            var num6 = sqrt(((1 + m11) - m00) - m22);
+            var num3 = 0.5 / num6;
+            quaternion.x = (m10 + m01) * num3;
+            quaternion.y = 0.5 * num6;
+            quaternion.z = (m21 + m12) * num3;
+            quaternion.w = (m20 - m02) * num3;
+            return quaternion;
+        }
+        var num5 = sqrt(((1 + m22) - m00) - m11);
+        var num2 = 0.5 / num5;
+        quaternion.x = (m20 + m02) * num2;
+        quaternion.y = (m21 + m12) * num2;
+        quaternion.z = 0.5 * num5;
+        quaternion.w = (m01 - m10) * num2;
+        return quaternion;
+		
+	}
+
+    //Returns a quaternion which rotates from one vector to another vector
+    static FromToRotation = function(from_vec, to_vec, up_vec) {
+		gml_pragma("forceinline");
+		var qa = new quat().FromLookRotation(from_vec, up_vec);
+		var qb = new quat().FromLookRotation(to_vec, up_vec);
+		var t = 100000000;
+        return qa.RotateTowards(qb, t);
+    }
+
+	//Returns the quaternion lerped toward another by the provided amount
+	static Lerp = function (q, t) {
 		gml_pragma("forceinline");
 		// negate second quat if dot product is negative
-		var l2 = self.Dot(val);
-		var q = val;
+		var l2 = self.Dot(q);
+		var _q = val;
 		if(l2 < 0.0) {
-		q = q.Negate();
+		_q = _q.Negate();
 		}
 		var c = new quat();
 		// c = a + t(b - a)  -->   c = a - t(a - b)
 		// the latter is slightly better on x64
-		c.x = self.x - t*(self.x - q.x);
-		c.y = self.y - t*(self.y - q.y);
-		c.z = self.z - t*(self.z - q.z);
-		c.w = self.w - t*(self.w - q.w);
+		c.x = self.x - t*(self.x - _q.x);
+		c.y = self.y - t*(self.y - _q.y);
+		c.z = self.z - t*(self.z - _q.z);
+		c.w = self.w - t*(self.w - _q.w);
 		return c;
 	}
+	
+	//Returns the quaternion scaled up by the provided value
+	static Scale = function(val) {
+		gml_pragma("forceinline");
+		return new quat(self.x * val, self.y * val, self.z * val, self.w * val);	
+	}
+	
+	//Returns the quaternion multiplied with another
+	static Mul = function(q) {
+		gml_pragma("forceinline");
+		var qx =  self.x * q.w + self.y * q.z - self.z * q.y + self.w * q.x;
+		var qy = -self.x * q.z + self.y * q.w + self.z * q.x + self.w * q.y;
+		var qz =  self.x * q.y - self.y * q.x + self.z * q.w + self.w * q.z;
+		var qw = -self.x * q.x - self.y * q.y - self.z * q.z + self.w * q.w;
+		return new quat(qx, qy, qz, qw);
+	}
 
-	//Normalized Quaternion Lerp (you generally want to use this)
+	//Returns the sum of the quaternion and another
+	static Add = function(q) {
+		gml_pragma("forceinline");
+		return new quat(self.x + q.x, self.y + q.y, self.z + q.z, self.w + q.w);
+	}
+	
+	//Returns the difference of the quaternion and another
+	static Sub = function(q) {
+		gml_pragma("forceinline");
+		return new quat(self.x - q.x, self.y - q.y, self.z - q.z, self.w - q.w);
+	}
+
+	//Returns the x, y, and z components as a vec3
+	static AsVec3 = function() {
+		gml_pragma("forceinline");
+		return new vec3(self.x, self.y, self.z);
+	}
+
+	//Returns the x, y, z, and w compents as a vec4
+	static AsVec4 = function() {
+		gml_pragma("forceinline");
+		return new vec4(self.x, self.y, self.z, self.w);
+	}
+
+	//Returns a quaternion normalized and lerped toward another by the provided amount
 	static Nlerp = function(val, t) {
 		gml_pragma("forceinline");
 		var lq = self.Lerp(val, t);
 		lq = lq.Normalize();
 		return lq;
 	}
+	
+	//Returns a vector rotated by the quaternion
+	static TransformVec3 = function(vec) {
+		gml_pragma("forceinline");
+		var result = vec;
+		result.x = self.w*self.w*vec.x + 2*self.y*self.w*vec.z - 2*self.z*self.w*vec.y + self.x*self.x*vec.x + 2*self.y*self.x*vec.y + 2*self.z*self.x*vec.z - self.z*self.z*vec.x - self.y*self.y*vec.x;
+		result.y = 2*self.x*self.y*vec.x + self.y*self.y*vec.y + 2*self.z*self.y*vec.z + 2*self.w*self.z*vec.x - self.z*self.z*vec.y + self.w*self.w*vec.y - 2*self.x*self.w*vec.z - self.x*self.x*vec.y;
+		result.z = 2*self.x*self.z*vec.x + 2*self.y*self.z*vec.y + self.z*self.z*vec.z - 2*self.w*self.y*vec.x - self.y*self.y*vec.z + 2*self.w*self.x*vec.y - self.x*self.x*vec.z + self.w*self.w*vec.z;
+		return result;
+	
+	}
+		
+	//Returns the Concatenate of the quaternion and another
+	static Concat = function(q) {
+	gml_pragma("forceinline");
+	var result = new quat();
+
+	// Concatenate rotation is actually q2 * q1 instead of q1 * q2.
+	// So that's why value2 goes q1 and value1 goes q2.
+	var q1x = q.X;
+	var q1y = q.Y;
+	var q1z = q.Z;
+	var q1w = q.W;
+
+	var q2x = self.X;
+	var q2y = self.Y;
+	var q2z = self.Z;
+	var q2w = self.W;
+
+	// cross(av, bv)
+	var cx = q1y * q2z - q1z * q2y;
+	var cy = q1z * q2x - q1x * q2z;
+	var cz = q1x * q2y - q1y * q2x;
+
+	var dot = q1x * q2x + q1y * q2y + q1z * q2z;
+
+	result.x = q1x * q2w + q2x * q1w + cx;
+	result.y = q1y * q2w + q2y * q1w + cy;
+	result.z = q1z * q2w + q2z * q1w + cz;
+	result.w = q1w * q2w - dot;
+
+	return result;
+	}
 
 	//Returns the quaternion, position, and scale as a matrix array
-	static AsMatrix = function(pos_vec, scale_vec) {
+	static AsMatrix = function(pos_vec, scale_vec = new vec3(1, 1, 1)) {
 	    gml_pragma("forceinline");
 	    var mat = array_create(16,0);
 	    var sqw = self.w*self.w;
@@ -883,8 +1181,6 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	    return mat;
 	}
 
-
-
 	//Interpolates the quaternion towards another with spring-like motion and velocity
 	//Returns updated values as linear array: [rotation_quat, velocity_quat, difference_quat, acceleration_quat];
 	//The updated rotation and velocity quaternions need to be stored to allow for continuity in the next update.
@@ -894,66 +1190,11 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	    var goal = goal_quat;
 	    var vel = velocity_quat;
 	    var quat_dif = goal.Mul(q.Conjugate());
-	    var acceleration = quat_dif.Mul(stiffness).Sub(vel.Mul(damping));
-	    vel = vel.Add(acceleration.Mul(t));
-	    q = vel.Mul(t).Add(new quat(0, 0, 0, 1)).Mul(q);
+	    var acceleration = quat_dif.Scale(stiffness).Sub(vel.Mul(damping));
+	    vel = vel.Add(acceleration.Scale(t));
+	    q = vel.Scale(t).Add(new quat(0, 0, 0, 1)).Mul(q);
 	    q = q.Normalize();
 		return [q, vel, quat_dif, acceleration];
 	}
-
-	//Returns the x, y, and z components as a vec3
-	static AsVec3 = function() {
-		gml_pragma("forceinline");
-		return new vec3(self.x, self.y, self.z);
-	}
-
-	//Returns the x, y, z, and w compents as a vec4
-	static AsVec4 = function() {
-		gml_pragma("forceinline");
-		return new vec4(self.x, self.y, self.z, self.w);
-	}
 	
-	//Spherical Linear Interpolation that maintains constant angular velocity, where Nlerp does not.
-	static Slerp = function(q, t) {
-		gml_pragma("forceinline");
-		var qm = new quat();
-		var cosHalfTheta = self.w * q.w + self.x * q.x + self.y * q.y + self.z * q.z;
-		if (abs(cosHalfTheta) >= 1.0) {
-			qm.w = self.w;
-			qm.x = self.x;
-			qm.y = self.y;
-			qm.z = self.z;
-			return qm;
-		}
-		var halfTheta = arccos(cosHalfTheta);
-		var sinHalfTheta = sqrt(1.0 - cosHalfTheta*cosHalfTheta);
-		if (abs(sinHalfTheta) < 0.001) {
-			qm.w = (self.w * 0.5 + q.w * 0.5);
-			qm.x = (self.x * 0.5 + q.x * 0.5);
-			qm.y = (self.y * 0.5 + q.y * 0.5);
-			qm.z = (self.z * 0.5 + q.z * 0.5);
-			return qm;
-		}
-		var ratioA = sin((1 - t) * halfTheta) / sinHalfTheta;
-		var ratioB = sin(t * halfTheta) / sinHalfTheta; 
-		qm.w = (self.w * ratioA + q.w * ratioB);
-		qm.x = (self.x * ratioA + q.x * ratioB);
-		qm.y = (self.y * ratioA + q.y * ratioB);
-		qm.z = (self.z * ratioA + q.z * ratioB);
-		return qm;
-	}
-
-	//Returns true if the given quaternion is exactly equal to this quaternion
-    static Equals = function(q) {
-		gml_pragma("forceinline");
-        return (self.x == q.x) && (self.y == q.y) && (self.z == q.z) && (self.w == q.w);
-    }
-
-	//Overwrites the quaternion with a new one generated from angle axis
-	static FromAngleAxis = function(angle, axis) {
-	    gml_pragma("forceinline");
-	    var halfAngle = angle * 0.5;
-	    var s = sin(halfAngle);
-	    return new quat(axis.x * s, axis.y * s, axis.z * s, cos(halfAngle));
-	}
 }

@@ -10,13 +10,16 @@ cam = camera_create();
 //Camera Vectors
 pos = new vec3(0, -200, 100);
 target = new vec3(0, 0, 0);
-up_vec = new vec3(0, 0, 1);
+up = new vec3(0, 0, 1);
 
 //Camera Settings
 fov = 60;
 znear = 0.1;
 zfar = 100000;
 
+dir = pos.Sub(target).Normalize();
+view_quat = new quat().FromLookRotation(dir, up);
+selected_mat = -1;
 #endregion
 #region Macros
 
