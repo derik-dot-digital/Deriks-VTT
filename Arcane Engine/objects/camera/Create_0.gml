@@ -8,29 +8,31 @@ gpu_set_zwriteenable(true);
 cam = camera_create();
 
 //Camera Vectors
-pos = new vec3(0, -200, 100);
+pos = new vec3(0, 200, 100);
 target = new vec3(0, 0, 0);
 up = new vec3(0, 0, 1);
+dir = pos.Sub(target).Normalize();
+view_quat = new quat().FromLookRotation(dir, up);
+right = up.Cross(dir).Normalize();
 
 //Camera Settings
 fov = 60;
 znear = 0.1;
 zfar = 100000;
-
-dir = pos.Sub(target).Normalize();
-view_quat = new quat().FromLookRotation(dir, up);
+zoom = 200; 
 selected_mat = -1;
+
 #endregion
 #region Macros
 
 //Window Size
-#macro win_w window_get_width()
-#macro win_h window_get_height()
+#macro win_w max(window_get_width(), 2)
+#macro win_h max(window_get_height(), 2)
 
 //World Vectors
 #macro world_up new vec3(0, 0, 1)
-#macro world_x new vec3(0, 1, 0)
-#macro world_y new vec3(1, 0, 0)
+#macro world_x new vec3(1, 0, 0)
+#macro world_y new vec3(0, 1, 0)
 #macro world_down new vec3(0, 0, -1)
 
 #endregion

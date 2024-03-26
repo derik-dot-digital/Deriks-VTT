@@ -19,8 +19,10 @@ if mouse_check_button(mb_middle) {
 
 	//Orbital Pan
 	if mouse_delta.Magnitude() != 0 {
-
-
+		var xrot_quat = new quat().FromAngleAxis(-mouse_delta.x * 0.01, up).Normalize();
+		pos = xrot_quat.TransformVec3(pos.Sub(target)).Add(target);
+		var yrot_quat = new quat().FromAngleAxis(-mouse_delta.y * 0.01, right).Normalize();
+		pos = yrot_quat.TransformVec3(pos.Sub(target)).Add(target);
 	}
 }
 
@@ -30,6 +32,18 @@ mouse_pos_prev = mouse_pos;
 
 #endregion
 #region Camera
+
+var mag  = pos.Sub(target).Magnitude();
+var new_dir = pos.Sub(target).Normalize();
+pos = target.Add(new_dir.Mul(zoom));
+
+dir = pos.Sub(target).Normalize();
+right = up.Cross(dir).Normalize();
+up = dir.Cross(right).Normalize();
+
+
+	
+view_quat = new quat().FromLookRotation(dir, up).Normalize();
 
 #endregion
 #region ImGUI
@@ -47,9 +61,3 @@ if (ImGui.BeginMenu("Options")) {
 
 #endregion
 
-//var cam_rot = new quat().FromAngleAxis(up, 0.01);
-//view_quat = view_quat.Mul(cam_rot);.
-
-//pos = target.Add(new vec3(lengthdir_x(-200, current_time/100), lengthdir_y(-200, current_time/100), 100));
-//dir = pos.Sub(target).Normalize();
-//view_quat = new quat().FromLookRotation(dir, up).Normalize();

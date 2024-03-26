@@ -5,15 +5,17 @@ var ww = win_w;
 var wh = win_h;
 
 if keyboard_check_released(vk_space) {selected_mat *= -1;}
+
 //Build Matrices
-if selected_mat = -1 {
-var mat_view = view_quat.AsMatrix(pos);
-} else {
-var mat_view = matrix_build_lookat(pos.x, pos.y, pos.z, target.x, target.y, target.z, up.x, up.y, up.z);	
+if selected_mat = -1 { //Quaternion
+var mat_view = view_quat.Normalize().AsMatrix(pos);
+mat_view = matrix_orthogonalize(mat_view)
+} else { //Built in
+var mat_view = matrix_build_lookat(pos.x, pos.y, pos.z, target.x, target.y, target.z, world_up.x, world_up.y, world_up.z);	
 }
 var mat_proj = matrix_build_projection_perspective_fov(-fov, ww/wh, znear, zfar);
 show_debug_message(selected_mat);
-show_debug_message(mat_view);
+//show_debug_message(mat_view);
 
 //Ensure correct surface size
 if surface_get_width(application_surface) != ww or surface_get_height(application_surface) != wh {

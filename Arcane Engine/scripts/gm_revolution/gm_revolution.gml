@@ -568,10 +568,52 @@ function vec3(x = 0, y = 0, z = 0) constructor {
 	
 	//Returns the vector as a Vec4
 	static AsVec4 = function(w) {
-	gml_pragma("forceinline");
-	return new vec4(self.x, self.y, self.z, w);	
+		gml_pragma("forceinline");
+		return new vec4(self.x, self.y, self.z, w);	
 	}
 	
+	//Rotates the vector position around another vector position
+	static RotateAround = function(origin, axis, angle) {
+		gml_pragma("forceinline");
+		var q = new quat().FromAngleAxis(angle, axis.Normalize()).Normalize();
+		return q.TransformVec3(self.Sub(origin)).Add(origin);
+	}
+	
+	//Multiplies the vector by a quaternion
+	static MulQuat = function(q) {
+		var result = new vec3();
+		var qx = q.x;
+		var qy = q.y;
+		var qz = q.z;
+		var qw = q.w;
+		result.x = self.x*(qx*qx+qw*qw-qy*qy- qz*qz) + self.y*(2*qx*qy- 2*qw*qz) + self.z*(2*qx*qz+ 2*qw*qy)
+		result.y = self.x*(2*qw*qz + 2*qx*qy) + self.y*(qw*qw - qx*qx+ qy*qy - qz*qz)+ self.z*(-2*qw*qx+ 2*qy*qz)
+		result.z = self.x*(-2*qw*qy+ 2*qx*qz) + self.y*(2*qw*qx+ 2*qy*qz)+ self.z*(qw*qw - qx*qx- qy*qy+ qz*qz)
+		return result;
+	}
+		
+	//Rotates the vector by a quaternion
+	static RotatebyQuat = function(q) {
+		var _x = q.x * 2.0;
+		var _y = q.y * 2.0;
+		var _z = q.z * 2.0;
+		var xx = q.x * _x;
+		var yy = q.y * _y;
+		var zz = q.z * _z;
+		var xy = q.x * _y;
+		var xz = q.x * _z;
+		var yz = q.y * _z;
+		var wx = q.w * _x;
+		var wy = q.w * _y;
+		var wz = q.w * _z;
+
+		var res = new vec3();
+		res.x = (1.0 - (yy + zz)) * self.x + (xy - wz) * self.y + (xz + wy) * self.z;
+		res.y = (xy + wz) * self.x + (1.0 - (xx + zz)) * self.y + (yz - wx) * self.z;
+		res.z = (xz - wy) * self.x + (yz + wx) * self.y + (1.0 - (xx + yy)) * self.z;
+		return res;
+	}
+		
 }
 
 //Returns a struct containing x, y, z, and w
@@ -747,14 +789,14 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	static ToAngleAxis = function() {
 		gml_pragma("forceinline");			
 		var angles = new vec3(0, 0, 0);
-	    var sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-	    var cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+	    var sinr_cosp = 2 * (self.w * self.x + self.y * self.z);
+	    var cosr_cosp = 1 - 2 * (self.x * self.x + self.y * self.y);
 	    angles.x = arctan2(sinr_cosp, cosr_cosp);
-	    var sinp = sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
-	    var cosp = sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
-	    angles.y = 2 * arctan2(sinp, cosp) - M_PI / 2;
-	    var siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-	    var cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+	    var sinp = sqrt(1 + 2 * (self.w * self.y - self.x * self.z));
+	    var cosp = sqrt(1 - 2 * (self.w * self.y - self.x * self.z));
+	    angles.y = 2 * arctan2(sinp, cosp) - pi / 2;
+	    var siny_cosp = 2 * (self.w * self.z + self.x * self.y);
+	    var cosy_cosp = 1 - 2 * (self.y * self.y + self.z * self.z);
 	    angles.z= arctan2(siny_cosp, cosy_cosp);
 		return angles;
 	}
@@ -789,8 +831,8 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 		return  result;
 	}
 
-	//Returns a quaternion representing a rotation around a unit axis by an angle in radians.
-    static FromAngleAxis = function(axis, angle) {
+	//Returns a quateranion representing a rotation around a unit axis by an angle in radians.
+    static FromAngleAxis = function(angle, axis) {
 		gml_pragma("forceinline");
         var sina = sin(0.5 * angle);
 		var cosa = cos(0.5 * angle);
@@ -973,9 +1015,9 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	//Returns a quaternion generated from a specified forward and upward vector
 	static FromLookRotation = function(forward_vec, up_vec) {
 		gml_pragma("forceinline");
-		var forward = forward_vec.Normalize();
+		var forward = forward_vec.Negate().Normalize();
         var right = up_vec.Cross(forward).Normalize();
-        var up = forward.Cross(right);
+        var up = forward.Cross(right).Normalize();
         var m00 = right.x;
         var m01 = right.y;
         var m02 = right.z;
@@ -987,7 +1029,7 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
         var m22 = forward.z;
 		
         var num8 = (m00 + m11) + m22;
-        var quaternion = new quat();
+        var quaternion = new quat(); quaternion.w = 0;
         if (num8 > 0)
         {
             var num = sqrt(num8 + 1);
@@ -1122,15 +1164,15 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 
 	// Concatenate rotation is actually q2 * q1 instead of q1 * q2.
 	// So that's why value2 goes q1 and value1 goes q2.
-	var q1x = q.X;
-	var q1y = q.Y;
-	var q1z = q.Z;
-	var q1w = q.W;
+	var q1x = q.x;
+	var q1y = q.y;
+	var q1z = q.z;
+	var q1w = q.w;
 
-	var q2x = self.X;
-	var q2y = self.Y;
-	var q2z = self.Z;
-	var q2w = self.W;
+	var q2x = self.x;
+	var q2y = self.y;
+	var q2z = self.z;
+	var q2w = self.w;
 
 	// cross(av, bv)
 	var cx = q1y * q2z - q1z * q2y;
@@ -1148,37 +1190,52 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	}
 
 	//Returns the quaternion, position, and scale as a matrix array
-	static AsMatrix = function(pos_vec, scale_vec = new vec3(1, 1, 1)) {
+	//Can be using in combination with the FromLookRotation to recreate a LookAt Matrix identical to GMs
+	static AsMatrix = function(pos_vec) {
 	    gml_pragma("forceinline");
-	    var mat = array_create(16,0);
-	    var sqw = self.w*self.w;
-	    var sqx = self.x*self.x;
-	    var sqy = self.y*self.y;
-	    var sqz = self.z*self.z;
-	    mat[@0] = (sqx - sqy - sqz + sqw) * scale_vec.x; // since sqw + sqx + sqy + sqz =1
-	    mat[@5] = (-sqx + sqy - sqz + sqw) * scale_vec.y;
-	    mat[@10] = (-sqx - sqy + sqz + sqw) * scale_vec.z;
+		var mat = array_create(16, 0);
+		var sqw = self.w * self.w;
+		var sqx = self.x * self.x;
+		var sqy = self.y * self.y;
+		var sqz = self.z * self.z;
 
-	    var tmp1 = self.x*self.y;
-	    var tmp2 = self.z*self.w;
-	    mat[@1] = 2.0 * (tmp1 + tmp2) * scale_vec.y;
-	    mat[@4] = 2.0 * (tmp1 - tmp2) * scale_vec.x;
+		// Rotation matrix components
+		mat[0] = sqx - sqy - sqz + sqw;
+		mat[5] = -sqx + sqy - sqz + sqw;
+		mat[10] = -sqx - sqy + sqz + sqw;
 
-	    tmp1 = self.x*self.z;
-	    tmp2 = self.y*self.w;
-	    mat[@2] = 2.0 * (tmp1 - tmp2) * scale_vec.z;
-	    mat[@8] = 2.0 * (tmp1 + tmp2) * scale_vec.x;
+		var tmp1 = self.x * self.y;
+		var tmp2 = self.z * self.w;
+		mat[1] = 2.0 * (tmp1 + tmp2);
+		mat[4] = 2.0 * (tmp1 - tmp2);
 
-	    tmp1 = self.y*self.z;
-	    tmp2 = self.x*self.w;
-	    mat[@6] = 2.0 * (tmp1 + tmp2) * scale_vec.z;
-	    mat[@9] = 2.0 * (tmp1 - tmp2) * scale_vec.y;
+		tmp1 = self.x * self.z;
+		tmp2 = self.y * self.w;
+		mat[2] = 2.0 * (tmp1 - tmp2);
+		mat[8] = 2.0 * (tmp1 + tmp2);
 
-	    mat[@12] = pos_vec.x;
-	    mat[@13] = pos_vec.y;
-	    mat[@14] = pos_vec.z;
-	    mat[@15] = 1.0;
-	    return mat;
+		tmp1 = self.y * self.z;
+		tmp2 = self.x * self.w;
+		mat[6] = 2.0 * (tmp1 + tmp2);
+		mat[9] = 2.0 * (tmp1 - tmp2);
+
+		// Invert the rotation for the view matrix
+		for (var i = 0; i < 3; i++) {
+			for (var j = i + 1; j < 3; j++) {
+			    var temp = mat[i * 4 + j];
+			    mat[i * 4 + j] = mat[j * 4 + i];
+			    mat[j * 4 + i] = temp;
+			}
+		}
+
+		// Translation components (inverted for view matrix)
+		mat[12] = -(mat[0] * pos_vec.x + mat[4] * pos_vec.y + mat[8] * pos_vec.z);
+		mat[13] = -(mat[1] * pos_vec.x + mat[5] * pos_vec.y + mat[9] * pos_vec.z);
+		mat[14] = -(mat[2] * pos_vec.x + mat[6] * pos_vec.y + mat[10] * pos_vec.z);
+		mat[15] = 1.0;
+
+		return mat;
+	
 	}
 
 	//Interpolates the quaternion towards another with spring-like motion and velocity
