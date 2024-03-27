@@ -14,7 +14,7 @@ mat_view = matrix_orthogonalize(mat_view)
 var mat_view = matrix_build_lookat(pos.x, pos.y, pos.z, target.x, target.y, target.z, world_up.x, world_up.y, world_up.z);	
 }
 var mat_proj = matrix_build_projection_perspective_fov(-fov, ww/wh, znear, zfar);
-show_debug_message(selected_mat);
+//show_debug_message(selected_mat);
 //show_debug_message(mat_view);
 
 //Ensure correct surface size

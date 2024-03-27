@@ -38,7 +38,7 @@ function vbuff_create_grid(grid_size, tile_size) {
 	vertex_begin(vb, vgrid_format);
 	
 	//Collumns
-	for (var i = 0; i < grid_size; i++) {
+	for (var i = 0; i <= grid_size; i++) {
 
 	//Point Position
     var x1 = sx + (i * tile_size);
@@ -53,7 +53,7 @@ function vbuff_create_grid(grid_size, tile_size) {
 	}
 	
 	//Rows
-	for (var j = 0; j < grid_size; j++) {
+	for (var j = 0; j <= grid_size; j++) {
 
 	//Point Position
     var x1 = sx;

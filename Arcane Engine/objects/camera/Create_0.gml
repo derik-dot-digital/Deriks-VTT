@@ -15,12 +15,15 @@ dir = pos.Sub(target).Normalize();
 view_quat = new quat().FromLookRotation(dir, up);
 right = up.Cross(dir).Normalize();
 
+//yaw = 0;
+//pitch = 0;
 //Camera Settings
 fov = 60;
 znear = 0.1;
 zfar = 100000;
 zoom = 200; 
 selected_mat = -1;
+zoom_strength = 0.01;
 
 #endregion
 #region Macros
@@ -40,6 +43,17 @@ selected_mat = -1;
 
 //Initialize ImGui
 ImGui.__Initialize();
+
+//Store Open Menu Status
+camera_settings_open = false;
+
+_static = undefined;
+try {
+	_static = static_get(ImGui);
+} catch (e) {
+	_static = undefined;
+}
+
 
 #endregion
 #region Input

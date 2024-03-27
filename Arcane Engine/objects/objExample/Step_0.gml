@@ -99,7 +99,6 @@ if (main_open) {
 	
 	var ret = ImGui.Begin("ImGui_GM Example", main_open, ImGuiWindowFlags.None, ImGuiReturnMask.Both);
 	main_open = ret & ImGuiReturnMask.Pointer;
-	
 	if (ret & ImGuiReturnMask.Return) {
 		var width = ImGui.GetContentRegionAvailX(), height = 256;
 		

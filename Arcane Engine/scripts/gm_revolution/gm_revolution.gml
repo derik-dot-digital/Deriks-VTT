@@ -785,6 +785,12 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 		return "quat";	
 	}
 	
+	//Returns the vector as a linear array
+	static AsLinearArray = function() {
+		gml_pragma("forceinline");
+		return [self.x, self.y, self.z, self.w];
+	}
+	
 	//Returns the quaternion as Radians stored in a vec3 (assumes the quat is normalized)
 	static ToAngleAxis = function() {
 		gml_pragma("forceinline");			
@@ -958,7 +964,7 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	//Returns the quaternion spherically interpolated towards another quaternion by the provided amount
 	static Slerp = function(q, t) {
 		gml_pragma("forceinline");
-		var dt = self.dot(q);
+		var dt = self.Dot(q);
 		var q2 = q;
 		if (dt < 0.0)
 		{
@@ -968,7 +974,7 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 
 		if (dt < 0.9995)
 		{
-		var angle = acos(dt);
+		var angle = arccos(dt);
 		var s = 1 / sqrt(1.0 - dt * dt);    // 1.0f / sin(angle)
 		var w1 = sin(angle * (1.0 - t)) * s;
 		var w2 = sin(angle * t) * s;
@@ -1084,7 +1090,7 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 		gml_pragma("forceinline");
 		// negate second quat if dot product is negative
 		var l2 = self.Dot(q);
-		var _q = val;
+		var _q = q;
 		if(l2 < 0.0) {
 		_q = _q.Negate();
 		}
@@ -1252,6 +1258,42 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	    q = vel.Scale(t).Add(new quat(0, 0, 0, 1)).Mul(q);
 	    q = q.Normalize();
 		return [q, vel, quat_dif, acceleration];
+	}
+	
+	static RotateLocalX = function(angle) { 
+		gml_pragma("forceinline");
+		var q = new quat(0.5*dsin(angle), 0, 0, dcos(0.5*angle));
+		return q.Mul(self);
+	}
+
+	static RotateLocalY = function(angle) { 
+		gml_pragma("forceinline");
+		var q = new quat(0, 0.5*dsin(angle), 0, dcos(0.5*angle));
+		return q.Mul(self);
+	}
+
+	static RotateLocalZ = function(angle) { 
+		gml_pragma("forceinline");
+		var q = new quat(0, 0, 0.5*dsin(angle), dcos(0.5*angle));
+		return q.Mul(self);
+	}
+
+	static RotateWorldX = function(angle) { 
+		gml_pragma("forceinline");
+		var q = new quat(0.5*dsin(angle), 0, 0, dcos(0.5*angle));
+		return q.Mul(self);
+	}
+
+	static RotateWorldY = function(angle) { 
+		gml_pragma("forceinline");
+		var q = new quat(0, 0.5*dsin(angle), 0, dcos(0.5*angle));
+		return q.Mul(self);
+	}
+
+	static RotateWorldZ = function(angle) { 
+		gml_pragma("forceinline");
+		var q = new quat(0, 0, 0.5*dsin(angle), dcos(0.5*angle));
+		return q.Mul(self);
 	}
 	
 }
