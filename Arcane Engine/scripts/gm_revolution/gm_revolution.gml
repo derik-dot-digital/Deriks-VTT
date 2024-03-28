@@ -769,6 +769,37 @@ function vec4(x = 0, y = 0, z = 0, w = 0) constructor {
 		gml_pragma("forceinline");
 		return new quat(self.x, self.y, self.z, self.w);	
 	}
+
+	//Returns the x, y, and z components as a vec3
+	static AsVec3 = function() {
+		gml_pragma("forceinline");
+		return new vec3(self.x, self.y, self.z);
+	}
+
+	//Clamps each component of the vector
+	static Clamped = function(min_vec, max_vec) {
+		gml_pragma("forceinline");
+		return new vec4(clamp(self.x, min_vec.x, max_vec.x), clamp(self.y, min_vec.y, max_vec.y), clamp(self.z, min_vec.z, max_vec.z), clamp(self.w, min_vec.w, max_vec.w));
+	}
+	
+	//Returns the vector with the values wrapped to be in the specified range
+	static Wrapped = function(min_vec, max_vec) {
+		gml_pragma("forceinline");
+		return new vec4(	wrap(self.x, min_vec.x, min_vec.x),
+											wrap(self.y, min_vec.y, min_vec.y),
+											wrap(self.z, min_vec.z, min_vec.z),
+											wrap(self.w, min_vec.w, min_vec.w));
+	}
+
+	//Returns the vector with values mapped to be between 0 and 1
+	static ColortoShader = function() {
+		gml_pragma("forceinline");
+		var min_vec = new vec4(0.0, 0.0, 0.0, 0.0);
+		var max_vec = new vec4(1.0, 1.0, 1.0, 1.0);
+		var result = self.Div(255).Clamped(min_vec, max_vec);
+		result.w = self.w; //This assumes the Alpha is already in-range.
+		return result;
+	}
 	
 }
 
@@ -1155,11 +1186,13 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	//Returns a vector rotated by the quaternion
 	static TransformVec3 = function(vec) {
 		gml_pragma("forceinline");
-		var result = vec;
-		result.x = self.w*self.w*vec.x + 2*self.y*self.w*vec.z - 2*self.z*self.w*vec.y + self.x*self.x*vec.x + 2*self.y*self.x*vec.y + 2*self.z*self.x*vec.z - self.z*self.z*vec.x - self.y*self.y*vec.x;
-		result.y = 2*self.x*self.y*vec.x + self.y*self.y*vec.y + 2*self.z*self.y*vec.z + 2*self.w*self.z*vec.x - self.z*self.z*vec.y + self.w*self.w*vec.y - 2*self.x*self.w*vec.z - self.x*self.x*vec.y;
-		result.z = 2*self.x*self.z*vec.x + 2*self.y*self.z*vec.y + self.z*self.z*vec.z - 2*self.w*self.y*vec.x - self.y*self.y*vec.z + 2*self.w*self.x*vec.y - self.x*self.x*vec.z + self.w*self.w*vec.z;
-		return result;
+		var res = new quat(vec.x, vec.y, vec.z, 0).Mul(self);
+		res.x *= -1;
+		res.y *= -1;
+		res.z *= -1;
+		res.w  =  0;
+		res = res.Mul(self);
+		return res.AsVec3();
 	
 	}
 		
@@ -1297,3 +1330,56 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	}
 	
 }
+
+
+
+//INCLUDE THESE LATER IN A MATRIX STRUCT
+function array_lerp(array1, array2, t) {
+
+    if (array_length(array1) != array_length(array2)) {
+        show_error("Arrays must have the same length for interpolation.",true);
+        return undefined;
+    }
+
+    var result = array_create(array_length(array1), 0);
+
+    for (var i = 0; i < array_length(array1); i++) {
+        result[i] = lerp(array1[i], array2[i], t);
+    }
+
+    return result;
+};
+
+function array_lerp_exp(array1, array2, t, exponent) {
+
+    if (array_length(array1) != array_length(array2)) {
+        show_error("Arrays must have the same length for interpolation.",true);
+        return undefined;
+    }
+
+    var result = array_create(array_length(array1), 0);
+
+    for (var i = 0; i < array_length(array1); i++) {
+        result[i] = lerp_exp(array1[i], array2[i], t, exponent);
+    }
+
+    return result;
+};
+
+function lerp_exp(a, b, t, exponent) {
+    return a + (b - a) * (1 - power(1 - t, exponent));
+};
+
+
+function wrap(val, _min, _max) {
+	var _val = val;
+    var _range = _max - _min;
+    
+    // Keep adding or subtracting range to the value until its wraped.
+    while (_val < _min) _val += _range;
+    while (_val > _max) _val -= _range; 
+    
+    // Return the value.
+    return(_val);
+}
+

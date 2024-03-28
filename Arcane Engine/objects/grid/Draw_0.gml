@@ -9,6 +9,17 @@ matrix_set(matrix_world, grid_mat);
 //Set Grid Shader
 shader_set(shd_grid);
 
+//Update Rainbow Color Anim
+rainbow_color_frame+=rainbow_color_spd;
+
+//Store Uniforms in array
+var settings_array = [	grid_color.x, grid_color.y, grid_color.z, grid_color.w,
+											dashed, dash_scale, dash_offset, dash_spacing,
+											color_mode, rainbow_color_frame, rainbow_color_scale];
+
+//Pass in Uniforms
+shader_set_uniform_f_array(uni_array, settings_array);
+
 //Submit Point List
 vertex_submit(vbuff_grid, pr_linelist, -1);
 

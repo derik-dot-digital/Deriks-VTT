@@ -14,16 +14,23 @@ up = new vec3(0, 0, 1);
 dir = pos.Sub(target).Normalize();
 view_quat = new quat().FromLookRotation(dir, up);
 right = up.Cross(dir).Normalize();
+dir = world_up.RotatebyQuat(view_quat).Normalize();
 
-//yaw = 0;
-//pitch = 0;
 //Camera Settings
 fov = 60;
-znear = 0.1;
+znear = 0.0001;
 zfar = 100000;
 zoom = 200; 
 selected_mat = -1;
 zoom_strength = 0.01;
+projection_slider = 0;
+
+//Store Matrices
+mat_view = view_quat.Normalize().AsMatrix(pos);
+var ww = win_w; var wh = win_h;
+aspect = ww/wh;
+mat_proj_perspective = matrix_build_projection_perspective_fov(-fov, ww/wh, znear, zfar);
+mat_proj_orthographic = matrix_build_projection_ortho((-ww * 0.001) * zoom,  (-wh * 0.001) * zoom, znear, zfar);
 
 #endregion
 #region Macros
@@ -46,14 +53,7 @@ ImGui.__Initialize();
 
 //Store Open Menu Status
 camera_settings_open = false;
-
-_static = undefined;
-try {
-	_static = static_get(ImGui);
-} catch (e) {
-	_static = undefined;
-}
-
+grid_settings_open = false;
 
 #endregion
 #region Input

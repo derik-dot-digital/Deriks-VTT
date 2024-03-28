@@ -4,14 +4,34 @@
 tile_size = 50;
 grid_size = 100;
 
+//Grid Color Mode
+enum grid_color_mode {
+	solid,
+	rainbow_solid,
+	rainbow_wave	
+}
+color_mode = grid_color_mode.solid;
+
 //Color
-grid_color = c_white;
+grid_color = new vec4(1.0, 1.0, 1.0, 1.0);
+rainbow_color_spd = 0;
+rainbow_color_frame = 0;
+rainbow_color_scale = 0.001;
 
 //Store Grid Buffer
 vbuff_grid = undefined;
 
 //Grid Position
 grid_pos = new vec3(0.0, 0.0, 0.0);
+
+//Dashed Line Settings
+dashed = false;
+dash_scale = 0.5;
+dash_offset = 0;
+dash_spacing = 0.5;
+
+//Settings Array Uniform
+uni_array = shader_get_uniform(shd_grid, "uniform_array");
 
 #endregion
 #region Grid Builder
@@ -78,6 +98,7 @@ function vbuff_create_grid(grid_size, tile_size) {
 
 //Function for replacing vbuff with new grid
 function update_grid() {
+vertex_delete_buffer(vbuff_grid);
 vbuff_grid = vbuff_create_grid(grid_size, tile_size);	
 }
 
