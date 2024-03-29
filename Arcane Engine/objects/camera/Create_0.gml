@@ -13,8 +13,13 @@ target = new vec3(0, 0, 0);
 up = new vec3(0, 0, 1);
 dir = pos.Sub(target).Normalize();
 view_quat = new quat().FromLookRotation(dir, up);
-right = up.Cross(dir).Normalize();
+var xrot_quat = new quat().FromAngleAxis(0, world_up).Normalize();
+var yrot_quat = new quat().FromAngleAxis(0, world_x).Normalize();
+view_quat = xrot_quat.Mul(view_quat).Normalize();
+view_quat = view_quat.Mul(yrot_quat).Normalize();
 dir = world_up.RotatebyQuat(view_quat).Normalize();
+right = world_x.RotatebyQuat(view_quat).Normalize();
+up = dir.Cross(right).Normalize();
 
 //Camera Settings
 fov = 60;

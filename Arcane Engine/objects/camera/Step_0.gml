@@ -20,20 +20,37 @@ var numpad = [	keyboard_check_pressed(vk_numpad0),
 //Zoom +/- Input
 var plusminus = -keyboard_check(vk_add)+keyboard_check(vk_subtract);
 
+//Shift Input
+var shift = keyboard_check(vk_shift);
+
 #endregion
 #region Camera
 
 //Middle Mouse Actions
 if mouse_check_button(mb_middle) {
-
-	//Orbital Pan
-	if mouse_delta.Magnitude() != 0 {
+	
+	//Directional Pan
+	if shift { 
+		 
+		 //Pan Speed
+		 var pan_spd = mouse_delta.Mul(zoom).Mul(0.001);
+		 
+		 //Combine Movement
+		 var new_axes = new vec3().Add(right.Mul(pan_spd.x)).Add(up.Mul(pan_spd.y));
+		 
+		 //Move Along Axes
+		 target = target.Add(new_axes);
+		 
+	 } else { 	//Orbital Pan
+		
 		var xrot_quat = new quat().FromAngleAxis(-mouse_delta.x * 0.003, world_up).Normalize();
 		var yrot_quat = new quat().FromAngleAxis(mouse_delta.y  * 0.003, world_x).Normalize();
 		view_quat = xrot_quat.Mul(view_quat).Normalize();
 		view_quat = view_quat.Mul(yrot_quat).Normalize();
 		dir = world_up.RotatebyQuat(view_quat).Normalize();
-	}
+		right = world_x.RotatebyQuat(view_quat).Normalize();
+		
+	 }
 }
 
 //Scroll Wheel Actions
@@ -63,7 +80,6 @@ mouse_pos_prev = mouse_pos;
 pos = target.Add(dir.Mul(-zoom));
 
 //Update Vectors
-right = up.Cross(dir).Normalize();
 up = dir.Cross(right).Normalize();
 
 //Clamp Zoom Values

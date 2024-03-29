@@ -99,9 +99,12 @@ function vec2(x = 0, y = 0) constructor {
 	}
 	
 	//Multiply two vectors
-	static Mul = function(vec) {
+	static Mul = function(val) {
 		gml_pragma("forceinline");
-		return new vec2(self.x*vec.x, self.y*vec.y);
+        if (is_numeric(val)) {
+            return new vec2(self.x * val, self.y * val);
+        }
+		return new vec2(self.x*val.x, self.y*val.y);
 	}
 	
 	//Divide with another vector

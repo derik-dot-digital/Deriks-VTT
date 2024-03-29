@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_dmrvbm",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_dmrvbm",
+  "parent":{
+    "name":"DmrVBM",
+    "path":"folders/DmrVBM.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
