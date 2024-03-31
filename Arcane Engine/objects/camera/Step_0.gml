@@ -33,7 +33,7 @@ if mouse_check_button(mb_middle) {
 	if shift { 
 		 
 		 //Pan Speed
-		 var pan_spd = mouse_delta.Mul(zoom).Mul(0.001);
+		 var pan_spd = mouse_delta.Mul(zoom).Mul(0.0015);
 		 
 		 //Combine Movement
 		 var new_axes = new vec3().Add(right.Mul(pan_spd.x)).Add(up.Mul(pan_spd.y));
@@ -89,6 +89,9 @@ zoom_strength = max(zoom_strength, 0.001);
 #endregion
 #region ImGUI
 
+//Set Font
+ImGui.PushFont(font_dnd);
+
 //Tool Bar
 ImGui.BeginMainMenuBar();
 if (ImGui.BeginMenu("Options")) {
@@ -100,6 +103,7 @@ if (ImGui.BeginMenu("Options")) {
 	}
 	ImGui.EndMenu();
 }
+ImGui.EndMainMenuBar();
 
 //Camera Settings
 if camera_settings_open {	
@@ -129,6 +133,17 @@ if camera_settings_open {
 	//Camera Up Vector
 	var up_array = up.AsLinearArray();
 	ImGui.InputFloat3("Camera Up (Read Only)", up_array,,,,ImGuiInputTextFlags.ReadOnly);
+
+	//FOV
+	fov = ImGui.InputFloat("Field of View", fov, 1, 5);
+	if fov = 0 {fov += choose(-0.1, 0.1);}
+	
+	//ZNear
+	znear_perspective = ImGui.InputFloat("ZNear Perspective", znear_perspective, 0.01, 0.1);
+	znear_ortho = ImGui.InputFloat("ZNear Orthographic", znear_ortho, 0.01, 0.1);
+	
+	//ZFar
+	zfar = ImGui.InputFloat("ZFar", zfar, 0.01, 0.1);
 	
 	//Projection Slider
 	projection_slider = ImGui.SliderFloat("Projection Type", projection_slider, 0, 1);
@@ -137,7 +152,10 @@ if camera_settings_open {
 	zoom = ImGui.InputFloat("Zoom", zoom, 1, 5);
 	
 	//Zoom Strength
-	zoom_strength = ImGui.InputFloat("Zoom Strength", zoom_strength, 0.005,  0.005);
+	zoom_strength = ImGui.InputFloat("Zoom Strength", zoom_strength, 0.005,  0.005); 
+	
+	//Reset Camera
+	if ImGui.Button("Reset to Default") {cam_reset();}
 	
 	//End Menu
 	ImGui.End();
@@ -192,22 +210,128 @@ if grid_settings_open {
 		ImGui.TreePop();
 	}
 	
-	//Rainbow Color Speed
-	if grid.color_mode = grid_color_mode.rainbow_solid or grid.color_mode = grid_color_mode.rainbow_wave {
-		grid.rainbow_color_spd = ImGui.InputFloat("Rainbow Speed", grid.rainbow_color_spd, 0.01, 0.1);
-	}
-
 	//Rainbow Color Scale
 	if  grid.color_mode = grid_color_mode.rainbow_wave {
 		grid.rainbow_color_scale = ImGui.InputFloat("Rainbow Scale", grid.rainbow_color_scale, 0.001, 0.01);
 	}
 	
+	//Rainbow Color Speed
+	if grid.color_mode = grid_color_mode.rainbow_solid or grid.color_mode = grid_color_mode.rainbow_wave {
+		grid.rainbow_color_spd = ImGui.InputFloat("Rainbow Speed", grid.rainbow_color_spd, 0.01, 0.1);
+		grid.grid_color.w = ImGui.SliderFloat("Alpha", grid.grid_color.w, 0, 1);
+	}
+
 	//Force vBuffer regeneration
 	if regenerate_buffer {with(grid) {update_grid();}}
 	
 	//End Menu
 	ImGui.End();
 	
+}
+ 
+//Right Click Context Menu
+if mouse_check_button_released(mb_right) {
+	right_click_open = true;
+	ImGui.SetNextWindowPos(window_mouse_get_x(), window_mouse_get_y());
+}
+if right_click_open {
+	if (ImGui.Begin("right_click", right_click_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove)) {
+	
+		//Roll Die
+		if (ImGui.MenuItem("Roll Die")){
+			//Add functionality for rolling a 3D die with options for all die + physics
+			right_click_open = false;
+		}
+		
+		//Create New Asset
+		if (ImGui.MenuItem("Create New Asset")) and !create_asset_open{
+			create_asset_open = true;
+			ImGui.SetNextWindowPos(mouse_x, mouse_y);
+			right_click_open = false;
+		}
+		
+		//Create Primitive
+		if (ImGui.MenuItem("Create Primitive")){
+			//Add functionality for spawning 3D primitives
+			right_click_open = false;
+		}
+		
+	}
+	if !ImGui.IsWindowHovered() and mouse_check_button(mb_left) {right_click_open = false;}
+	ImGui.End();
+}
+
+//Create Asset
+if create_asset_open {
+	if (ImGui.Begin("Create Asset",, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoDecoration)) {
+		
+	//Asset Name
+	ImGui.Text("Asset Name:");
+	asset_create_name = ImGui.InputText("##label Asset Name", asset_create_name);
+	ImGui.Separator();	
+	
+	//Asset Type
+	ImGui.Text("Asset Type:");
+	if (ImGui.RadioButton("Art", asset_create_type == 0)) {asset_create_type = 0;} ImGui.SameLine();
+	if (ImGui.RadioButton("Map", asset_create_type == 1)) {asset_create_type = 1;} ImGui.SameLine();
+	if (ImGui.RadioButton("Player", asset_create_type == 2)) {asset_create_type = 2;} ImGui.SameLine();
+	if (ImGui.RadioButton("NPC", asset_create_type == 3)) {asset_create_type = 3;}
+	ImGui.Separator();	
+	
+	//Asset File
+	ImGui.Text("File Path:");
+	asset_create_filepath = ImGui.InputText("##label File Path", asset_create_filepath); ImGui.SameLine();
+	if (ImGui.ImageButton("File Picker Button", spr_file_icon, 0, c_white, 1, c_white, 0, 18, 18)) {asset_create_filepath = get_open_filename("", "");} //Add Supported Files to filter one day
+	var allow_creation = true;
+	if asset_create_filepath != "Copy file path here!"  {
+		if file_exists(asset_create_filepath) {
+		if !str_check_compatable_file_type(asset_create_filepath) {
+		ImGui.TextColored("**Invalid File Type", c_red, 1);	
+		allow_creation = false;
+		}
+		} else {
+			ImGui.TextColored("**File not found", c_red, 1);
+			allow_creation = false;
+		}
+	} else {ImGui.TextColored("**Required", c_white, 1); allow_creation = false;}
+	ImGui.Separator();	
+	
+	//Create		
+	var button_disabled = false; if !allow_creation {button_disabled = true;}
+	ImGui.BeginDisabled(button_disabled);
+	if (ImGui.Button("Create")  and allow_creation) {
+		var new_inst = instance_create_depth(0, 0, 0, asset);
+		new_inst.name = asset_create_name;
+		new_inst.type = asset_types.art;
+		new_inst.file_path = asset_create_filepath;
+		
+		//Reset Values
+		asset_create_type = 0;
+		asset_create_name = "Type name here!";
+		asset_create_filepath = "Copy file path here!";
+		
+		//Close Menu
+		create_asset_open = false;
+		
+	} 
+	 ImGui.SameLine();
+	ImGui.EndDisabled();
+	
+	//Canceled		
+	if (ImGui.Button("Cancel")) {
+
+		//Reset Values
+		asset_create_type = 0;
+		asset_create_name = "Type name here!";
+		asset_create_filepath = "Copy file path here!";
+		
+		//Close Menu
+		create_asset_open = false;
+		
+	} 
+	
+	}
+	ImGui.End();
 }
 
 

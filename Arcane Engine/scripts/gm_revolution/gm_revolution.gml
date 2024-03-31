@@ -1334,8 +1334,6 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	
 }
 
-
-
 //INCLUDE THESE LATER IN A MATRIX STRUCT
 function array_lerp(array1, array2, t) {
 

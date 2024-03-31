@@ -7,24 +7,34 @@ gpu_set_zwriteenable(true);
 //Create Camera Struct
 cam = camera_create();
 
+//Stores camera setup in a function so camera can be easily reset
+function cam_reset() {
+
 //Camera Vectors
 pos = new vec3(0, 200, 100);
 target = new vec3(0, 0, 0);
 up = new vec3(0, 0, 1);
+
+//Initalize Default Camera Position
 dir = pos.Sub(target).Normalize();
 view_quat = new quat().FromLookRotation(dir, up);
+
+//Adjust quat to system
 var xrot_quat = new quat().FromAngleAxis(0, world_up).Normalize();
 var yrot_quat = new quat().FromAngleAxis(0, world_x).Normalize();
 view_quat = xrot_quat.Mul(view_quat).Normalize();
 view_quat = view_quat.Mul(yrot_quat).Normalize();
+
+//Recalculate vectors
 dir = world_up.RotatebyQuat(view_quat).Normalize();
 right = world_x.RotatebyQuat(view_quat).Normalize();
 up = dir.Cross(right).Normalize();
 
 //Camera Settings
 fov = 60;
-znear = 0.0001;
+znear_perspective = 0.1;
 zfar = 100000;
+znear_ortho = -zfar;
 zoom = 200; 
 selected_mat = -1;
 zoom_strength = 0.01;
@@ -34,8 +44,13 @@ projection_slider = 0;
 mat_view = view_quat.Normalize().AsMatrix(pos);
 var ww = win_w; var wh = win_h;
 aspect = ww/wh;
-mat_proj_perspective = matrix_build_projection_perspective_fov(-fov, ww/wh, znear, zfar);
-mat_proj_orthographic = matrix_build_projection_ortho((-ww * 0.001) * zoom,  (-wh * 0.001) * zoom, znear, zfar);
+mat_proj_perspective = matrix_build_projection_perspective_fov(-fov, ww/wh, znear_perspective, zfar);
+mat_proj_orthographic = matrix_build_projection_ortho((-ww * 0.001) * zoom,  (-wh * 0.001) * zoom, znear_ortho, zfar);
+
+}
+
+//Call Function
+cam_reset();
 
 #endregion
 #region Macros
@@ -59,6 +74,17 @@ ImGui.__Initialize();
 //Store Open Menu Status
 camera_settings_open = false;
 grid_settings_open = false;
+right_click_open = false;
+create_asset_open = false;
+
+//Asset Creation Settings
+asset_create_type = 0;
+asset_create_name = "Type name here!";
+asset_create_filepath = "Copy file path here!";
+
+//Add Fonts
+font_default = ImGui.AddFontDefault();
+font_dnd = ImGui.AddFontFromFile("fonts/Bookinsanity Bold.ttf", 24);
 
 #endregion
 #region Input
