@@ -269,6 +269,7 @@
     {"name":"ImGui_Misc","order":2,"path":"scripts/ImGui_Misc/ImGui_Misc.yy",},
     {"name":"matrix_orthogonalize","order":1,"path":"scripts/matrix_orthogonalize/matrix_orthogonalize.yy",},
     {"name":"native_cursor_extras","order":5,"path":"scripts/native_cursor_extras/native_cursor_extras.yy",},
+    {"name":"cm_helper_scripts","order":3,"path":"scripts/cm_helper_scripts/cm_helper_scripts.yy",},
     {"name":"str_check_compatable_file_type","order":2,"path":"scripts/str_check_compatable_file_type/str_check_compatable_file_type.yy",},
     {"name":"sh_cm_debug","order":6,"path":"shaders/sh_cm_debug/sh_cm_debug.yy",},
     {"name":"sh_shadow","order":9,"path":"shaders/sh_shadow/sh_shadow.yy",},

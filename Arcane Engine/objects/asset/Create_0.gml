@@ -8,8 +8,10 @@ model = undefined;
 
 //Stores Texture/Sprite for Maps & Art
 art = undefined;
+art_w = grid.tile_size;
+art_h = grid.tile_size;
 
-//Stores the name of the Asset as a String
+//Stores the nasme of the Asset as a String
 name = "undefined";
 
 //Asset Loading 
@@ -18,7 +20,20 @@ file_loaded = false;
 file_requested = false; 
 file_request_id = undefined;
 
+//Store Mesh
+vbuff = undefined;
+
 //Store Collision shape
 col_shape = undefined;
+col_dynamic = undefined;
+
+//Position
+pos = new vec3(0, 0, 0);
+
+//Quaternion Rotation Orientation
+orientation = new quat();
+
+//Scale
+scale = new vec3(1, 1, 1);
 
 #endregion 

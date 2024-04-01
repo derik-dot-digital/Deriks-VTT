@@ -1231,9 +1231,9 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	return result;
 	}
 
-	//Returns the quaternion, position, and scale as a matrix array
+	//Returns the quaternion, position, and scale as a view matrix
 	//Can be using in combination with the FromLookRotation to recreate a LookAt Matrix identical to GMs
-	static AsMatrix = function(pos_vec) {
+	static AsViewMatrix = function(pos_vec) {
 	    gml_pragma("forceinline");
 		var mat = array_create(16, 0);
 		var sqw = self.w * self.w;
@@ -1278,6 +1278,40 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 
 		return mat;
 	
+	}
+
+	//Returns the quaternion, position, and scale as a transform matrix
+	static AsTransformMatrix = function(pos, scale) {
+		gml_pragma("forceinline");
+		var mat = array_create(16,0)
+		var sqw = self.w*self.w;
+		var sqx = self.x*self.x;
+		var sqy = self.y*self.y;
+		var sqz = self.z*self.z;
+		mat[@0] = (sqx - sqy - sqz + sqw) * scale.x; // since sqw + sqx + sqy + sqz =1
+		mat[@5] = (-sqx + sqy - sqz + sqw) * scale.y;
+		mat[@10] = (-sqx - sqy + sqz + sqw) * scale.z;
+   
+		var tmp1 = self.x*self.y;
+		var tmp2 = self.z*self.w;
+		mat[@1] = 2.0 * (tmp1 + tmp2) * scale.x;
+		mat[@4] = 2.0 * (tmp1 - tmp2) * scale.y;
+   
+		tmp1 = self.x*self.z;
+		tmp2 = self.y*self.w;
+		mat[@2] = 2.0 * (tmp1 - tmp2) * scale.x;
+		mat[@8] = 2.0 * (tmp1 + tmp2) * scale.z;
+   
+		tmp1 = self.y*self.z;
+		tmp2 = self.x*self.w;
+		mat[@6] = 2.0 * (tmp1 + tmp2) * scale.y;
+		mat[@9] = 2.0 * (tmp1 - tmp2) * scale.z;
+	
+		mat[@12] = pos.x;
+		mat[@13] = pos.y;
+		mat[@14] = pos.z;
+		mat[@15] = 1.0;
+		return mat
 	}
 
 	//Interpolates the quaternion towards another with spring-like motion and velocity
@@ -1334,7 +1368,7 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	
 }
 
-//INCLUDE THESE LATER IN A MATRIX STRUCT
+//TODO: INCLUDE THESE LATER IN A MATRIX STRUCT
 function array_lerp(array1, array2, t) {
 
     if (array_length(array1) != array_length(array2)) {
@@ -1370,7 +1404,6 @@ function array_lerp_exp(array1, array2, t, exponent) {
 function lerp_exp(a, b, t, exponent) {
     return a + (b - a) * (1 - power(1 - t, exponent));
 };
-
 
 function wrap(val, _min, _max) {
 	var _val = val;

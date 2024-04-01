@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"cm_helper_scripts",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"cm_helper_scripts",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

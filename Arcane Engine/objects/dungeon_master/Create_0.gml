@@ -19,6 +19,9 @@ enum asset_types {
 #endregion
 #region Colmesh
 
+//Store a Global Array of Texcoords for a flat image
+global.texcoords = [new vec2(0, 0), new vec2(0, 1), new vec2(1, 0), new vec2(1, 1)]
+
 //Store active collision shapes
 global.collision = cm_list();
 

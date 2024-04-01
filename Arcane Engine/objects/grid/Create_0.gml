@@ -33,6 +33,12 @@ dash_spacing = 0.5;
 //Settings Array Uniform
 uni_array = shader_get_uniform(shd_grid, "uniform_array");
 
+//Depth Settings
+depth_mode = "Default";
+
+//Cutout Mode
+overlay_mode = false;
+
 #endregion
 #region Grid Builder
 

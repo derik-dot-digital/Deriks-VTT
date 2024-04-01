@@ -3,6 +3,9 @@
 //Enable 3D
 gpu_set_ztestenable(true);
 gpu_set_zwriteenable(true);
+gpu_set_alphatestenable(true);
+gpu_set_alphatestref(0)
+gpu_set_blendenable(true);
 
 //Create Camera Struct
 cam = camera_create();
@@ -41,12 +44,12 @@ zoom_strength = 0.01;
 projection_slider = 0;
 
 //Store Matrices
-mat_view = view_quat.Normalize().AsMatrix(pos);
+mat_view = view_quat.Normalize().AsViewMatrix(pos);
 var ww = win_w; var wh = win_h;
 aspect = ww/wh;
 mat_proj_perspective = matrix_build_projection_perspective_fov(-fov, ww/wh, znear_perspective, zfar);
 mat_proj_orthographic = matrix_build_projection_ortho((-ww * 0.001) * zoom,  (-wh * 0.001) * zoom, znear_ortho, zfar);
-
+mat_projection = array_lerp_exp(mat_proj_perspective, mat_proj_orthographic, projection_slider, 5);
 }
 
 //Call Function

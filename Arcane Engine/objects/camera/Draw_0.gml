@@ -5,8 +5,8 @@ var ww = win_w;
 var wh = win_h;
 
 //Build Matrices
-var vm = view_quat.Normalize().AsMatrix(pos);
-var pm = array_lerp_exp(mat_proj_perspective, mat_proj_orthographic, projection_slider, 5);
+mat_view = view_quat.Normalize().AsViewMatrix(pos);
+mat_projection = array_lerp_exp(mat_proj_perspective, mat_proj_orthographic, projection_slider, 5);
 
 //Detect Changes in Window Size
 if surface_get_width(application_surface) != ww or surface_get_height(application_surface) != wh {
@@ -24,24 +24,45 @@ mat_proj_perspective = matrix_build_projection_perspective_fov(-fov, aspect, zne
 mat_proj_orthographic = matrix_build_projection_ortho((-ww * 0.001) * zoom,  (-wh * 0.001) * zoom, znear_ortho, zfar);
 	
 //Apply Matrices to Camera
-camera_set_view_mat(cam, vm);
-camera_set_proj_mat(cam, pm);
+camera_set_view_mat(cam, mat_view);
+camera_set_proj_mat(cam, mat_projection);
 
 //Apply Camera
 camera_apply(cam);
 
 //Clear Surface for new frame
-draw_clear_alpha(0, 0);
+draw_clear_alpha(0, 1);
+draw_clear(0)
 
 #endregion
 #region Draw Pass
 
 //Grid
-with(grid) {event_perform(ev_draw, 0);}
+var gd = grid.depth_mode;
+if gd = "Always Behind" {
+	gpu_set_zwriteenable(false);	
+}
+if gd != "Always Above" {
+with(grid) {
+	event_perform(ev_draw, 0);
+	}
+}
+if gd = "Always Behind" {
+	gpu_set_zwriteenable(true);	
+}
 
 //Assets
-gpu_set_depth(10);
 with(asset) {event_perform(ev_draw, 0);}
-gpu_set_depth(0);
+
+//Grid
+if gd = "Always Above" {
+	gpu_set_ztestenable(false);
+	gpu_set_zwriteenable(false);	
+	with(grid) {
+		event_perform(ev_draw, 0);
+	}
+	gpu_set_zwriteenable(true);	
+	gpu_set_ztestenable(true);
+}
 
 #endregion

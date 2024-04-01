@@ -23,6 +23,14 @@ var plusminus = -keyboard_check(vk_add)+keyboard_check(vk_subtract);
 //Shift Input
 var shift = keyboard_check(vk_shift);
 
+//Screen to World Cast
+var stw_cast = mouse_to_world_cast();
+if stw_cast[0] {	
+	///var hit_object = stw_cast[7];
+	//var hit_inst = cm_custom_parameter_get(hit_object);
+	//show_debug_message(hit_inst);
+}//else{show_debug_message("oof");}
+
 #endregion
 #region Camera
 
@@ -182,6 +190,19 @@ if grid_settings_open {
 	grid.tile_size = ImGui.InputInt("Tile Size", grid.tile_size, 1, 10);
 	if grid.tile_size != prev_tile_size {regenerate_buffer = 1;}
 
+	//Grid Depth Mode
+	var grid_depth_mode_str = ["Default", "Always Behind", "Always Above"];
+	var grid_depth_mode_open = ImGui.BeginCombo("Depth Mode", grid.depth_mode, ImGuiComboFlags.None);
+	if grid_depth_mode_open {
+		for (var i = 0; i < array_length(grid_depth_mode_str); i++) {
+			var item = ImGui.Selectable(grid_depth_mode_str[i],,ImGuiSelectableFlags.None);
+			if item = true {
+				grid.depth_mode = grid_depth_mode_str[i]; 
+			}
+		}
+	ImGui.EndCombo();
+	}
+	
 	//Grid Color Mode
 	var color_mode_str = ["Solid", "Rainbow Solid", "Rainbow Wave"];
 	var grid_color_mode_open = ImGui.BeginCombo("Color Mode", color_mode_str[grid.color_mode], ImGuiComboFlags.None);
@@ -194,6 +215,9 @@ if grid_settings_open {
 		}
 	ImGui.EndCombo();
 	}
+	
+	//Grid Overlay Mode
+	//grid.overlay_mode = ImGui.Checkbox("Overlay Mode", grid.overlay_mode);
 	
 	//Grid Color Picker
 	if grid.color_mode = grid_color_mode.solid {
@@ -208,7 +232,10 @@ if grid_settings_open {
 			ImGui.Separator();
 		}
 		ImGui.TreePop();
-	}
+		if !color_picker_open {
+			grid.grid_color.w = ImGui.SliderFloat("Alpha", grid.grid_color.w, 0, 1);
+		}
+	} 
 	
 	//Rainbow Color Scale
 	if  grid.color_mode = grid_color_mode.rainbow_wave {
