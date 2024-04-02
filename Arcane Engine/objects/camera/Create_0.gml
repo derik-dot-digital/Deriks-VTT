@@ -96,4 +96,11 @@ font_dnd = ImGui.AddFontFromFile("fonts/Bookinsanity Bold.ttf", 24);
 mouse_pos = new vec2(mouse_x, mouse_y);
 mouse_pos_prev = mouse_pos;
 
+//Asset Transform Axis Lock
+asset_axis_lock = new vec3(1, 1, 1);
+asset_axis_unlocked = new vec3(1, 1, 1);
+asset_pos_prev = new vec3(0, 0, 0);
+asset_quat_prev = new quat()
+asset_scale_prev = new vec3(1, 1, 1);
+
 #endregion

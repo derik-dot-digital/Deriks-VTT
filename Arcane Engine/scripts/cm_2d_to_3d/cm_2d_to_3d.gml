@@ -1,4 +1,4 @@
-/// @func cm_2d_to_3d(viewmat, projmat, x, y)
+ /// @func cm_2d_to_3d(viewmat, projmat, x, y)
 function cm_2d_to_3d(V, P, _x, _y) 
 {
 	/*

@@ -7,7 +7,7 @@ var grid_mat = matrix_build(grid_pos.x, grid_pos.y, grid_pos.z, 0, 0, 0, 1, 1, 1
 matrix_set(matrix_world, grid_mat);
 
 //Overlay Mode
-if overlay_mode {gpu_set_colorwriteenable(true,true,true,false);}
+//if overlay_mode {gpu_set_colorwriteenable(true,true,true,false);}
 
 //Set Grid Shader
 shader_set(shd_grid);
@@ -30,7 +30,7 @@ vertex_submit(vbuff_grid, pr_linelist, -1);
 shader_reset();
 
 //Overlay Mode
-if overlay_mode {gpu_set_colorwriteenable(true,true,true,true);}
+//if overlay_mode {gpu_set_colorwriteenable(true,true,true,true);}
 
 //Reset Matrix
 matrix_set(matrix_world, matrix_build_identity());

@@ -36,4 +36,7 @@ orientation = new quat();
 //Scale
 scale = new vec3(1, 1, 1);
 
+//Selection Status
+selected = false;
+
 #endregion 

@@ -16,6 +16,23 @@ enum asset_types {
 	npc,
 }
 
+//Asset Actions
+enum asset_actions {
+	idle,
+	move,
+	rotate,
+	scale
+}
+
+//Selected Inst ID
+global.selected_inst = noone;
+
+//Selection Action
+global.selection_action = asset_actions.idle;
+
+//Outline Size
+global.outline_size = 0.001;
+
 #endregion
 #region Colmesh
 

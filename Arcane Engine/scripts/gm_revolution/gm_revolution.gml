@@ -1351,19 +1351,19 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	static RotateWorldX = function(angle) { 
 		gml_pragma("forceinline");
 		var q = new quat(0.5*dsin(angle), 0, 0, dcos(0.5*angle));
-		return q.Mul(self);
+		return self.Mul(q);
 	}
 
 	static RotateWorldY = function(angle) { 
 		gml_pragma("forceinline");
 		var q = new quat(0, 0.5*dsin(angle), 0, dcos(0.5*angle));
-		return q.Mul(self);
+		return self.Mul(q);
 	}
 
 	static RotateWorldZ = function(angle) { 
 		gml_pragma("forceinline");
 		var q = new quat(0, 0, 0.5*dsin(angle), dcos(0.5*angle));
-		return q.Mul(self);
+		return self.Mul(q);
 	}
 	
 }

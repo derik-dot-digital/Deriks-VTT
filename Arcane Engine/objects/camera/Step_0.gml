@@ -25,11 +25,119 @@ var shift = keyboard_check(vk_shift);
 
 //Screen to World Cast
 var stw_cast = mouse_to_world_cast();
-if stw_cast[0] {	
-	///var hit_object = stw_cast[7];
-	//var hit_inst = cm_custom_parameter_get(hit_object);
-	//show_debug_message(hit_inst);
-}//else{show_debug_message("oof");}
+if mouse_check_button_pressed(mb_left)  {	
+	if stw_cast[0] {
+		var hit_object = stw_cast[7];
+		var hit_inst = cm_custom_parameter_get(hit_object);
+		global.selected_inst = hit_inst;
+	} else {
+		global.selected_inst = noone;
+		global.selection_action = asset_actions.idle;
+	}
+} 
+
+//Asset Action Detect
+if global.selected_inst != noone {
+	
+	//Axis Lock
+	if keyboard_check_released(ord("X")) {
+		if asset_axis_lock.Equals(world_x) {
+		asset_axis_lock = asset_axis_unlocked;	
+		} else {
+		asset_axis_lock = world_x;	
+		global.selected_inst.pos.y = asset_pos_prev.y;
+		global.selected_inst.pos.z = asset_pos_prev.z;
+		global.selected_inst.orientation = asset_quat_prev;
+		}
+	}
+	if keyboard_check_released(ord("Y")) {
+		if asset_axis_lock.Equals(world_y) {
+		asset_axis_lock = asset_axis_unlocked;	
+		} else {
+		asset_axis_lock = world_y;	
+		global.selected_inst.pos.x = asset_pos_prev.x;
+		global.selected_inst.pos.z = asset_pos_prev.z;
+		global.selected_inst.orientation = asset_quat_prev;
+		}
+	}
+	if keyboard_check_released(ord("Z")) {
+		if asset_axis_lock.Equals(world_up) {
+		asset_axis_lock = asset_axis_unlocked;	
+		} else {
+		asset_axis_lock = world_up;	
+		global.selected_inst.pos.x = asset_pos_prev.x;
+		global.selected_inst.pos.y = asset_pos_prev.y;
+		global.selected_inst.orientation = asset_quat_prev;
+		}
+	}
+	
+	//Move
+	if keyboard_check_released(ord("G")) {
+	asset_pos_prev = global.selected_inst.pos; 
+	global.selection_action = asset_actions.move;	
+	}
+	
+	//Rotate
+	if keyboard_check_released(ord("R")) {
+	asset_quat_prev = global.selected_inst.orientation;
+	global.selection_action = asset_actions.rotate;	
+	}
+	
+	//Set Camera Target
+	if keyboard_check_released(vk_decimal) {
+		target = global.selected_inst.pos;	
+	}
+	
+	//Finish Action
+	if keyboard_check_released(vk_enter) or mouse_check_button(mb_left) {
+	global.selection_action = asset_actions.idle;
+	}
+	
+} 
+	
+//Asset Actions Apply
+if global.selected_inst != noone {
+	switch(global.selection_action) {
+	
+	//Idle
+	case (asset_actions.idle):
+	asset_pos_prev = global.selected_inst.pos; 
+	asset_quat_prev = global.selected_inst.orientation;
+	asset_scale_prev = global.selected_inst.scale;
+	asset_axis_lock = asset_axis_unlocked;
+	break;
+
+	//Move
+	case (asset_actions.move):
+	
+	var move_vec = mouse_delta.AsVec3(0).RotatebyQuat(view_quat).Mul(-zoom*0.002).Mul(asset_axis_lock); //move_vec.z = 0;
+	global.selected_inst.pos = global.selected_inst.pos.Add(move_vec);
+	
+	break;
+
+	//Rotate
+	case (asset_actions.rotate):
+		
+		var rotate_vec = mouse_delta.AsVec3(0).RotatebyQuat(view_quat).Mul(-zoom*0.002).Mul(asset_axis_lock);
+	
+		//Local Rotation
+		if asset_axis_lock.Equals(asset_axis_unlocked) {
+			global.selected_inst.orientation = global.selected_inst.orientation.RotateLocalX(rotate_vec.x*0.1);
+			global.selected_inst.orientation = global.selected_inst.orientation.RotateLocalY(rotate_vec.y*0.1);
+			global.selected_inst.orientation = global.selected_inst.orientation.RotateLocalZ(rotate_vec.z*0.1);
+		} else {
+			global.selected_inst.orientation = global.selected_inst.orientation.RotateWorldX(rotate_vec.x*0.1);
+			global.selected_inst.orientation = global.selected_inst.orientation.RotateWorldY(rotate_vec.y*0.1);
+			global.selected_inst.orientation = global.selected_inst.orientation.RotateWorldZ(rotate_vec.z*0.1);
+		}
+		
+		global.selected_inst.orientation = global.selected_inst.orientation.Normalize();
+	
+	break;
+
+	
+	}
+}
 
 #endregion
 #region Camera

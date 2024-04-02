@@ -27,10 +27,11 @@ function cm_vbuff_plane() {
 	var cm = cm_list();
 	var vb = vertex_create_buffer();
 	cm_vbuff_begin(vb);
-	var p1 = new vec3(-0.5, -0.5, 0);
-	var p2 = new vec3(-0.5, 0.5, 0);
-	var p3 = new vec3(0.5, -0.5, 0);
-	var p4 = new vec4(0.5, 0.5, 0);
+	var scale = 0.5;
+	var p1 = new vec3(-scale, -scale, 0);
+	var p2 = new vec3(-scale, scale, 0);
+	var p3 = new vec3(scale, -scale, 0);
+	var p4 = new vec4(scale, scale, 0);
 	var t = global.texcoords;
 	var c = c_white;
 	var a = 1;
