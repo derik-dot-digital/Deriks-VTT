@@ -24,18 +24,26 @@ var plusminus = -keyboard_check(vk_add)+keyboard_check(vk_subtract);
 var shift = keyboard_check(vk_shift);
 
 //Screen to World Cast
-var stw_cast = mouse_to_world_cast();
-if mouse_check_button_pressed(mb_left)  {	
-	if stw_cast[0] {
-		var hit_object = stw_cast[7];
-		var hit_inst = cm_custom_parameter_get(hit_object);
-		global.selected_inst = hit_inst;
-	} else {
-		global.selected_inst = noone;
-		global.selection_action = asset_actions.idle;
-	}
-} 
-
+if !ImGui.IsAnyItemHovered() and !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) {
+	
+	//Screen to World Cast
+	var stw_cast = mouse_to_world_cast();
+	
+	//Check Mouse
+	if mouse_check_button_pressed(mb_left)  {	
+		if stw_cast[0] {
+			var hit_object = stw_cast[7];
+			var hit_inst = cm_custom_parameter_get(hit_object);
+			global.selected_inst = hit_inst;
+		} else {
+			if global.selection_action = asset_actions.idle {
+				global.selected_inst = noone;
+			}
+			global.selection_action = asset_actions.idle;
+		}
+	} 
+}
+	
 //Asset Action Detect
 if global.selected_inst != noone {
 	
@@ -142,6 +150,15 @@ if global.selected_inst != noone {
 #endregion
 #region Camera
 
+//Camera unlocked bt default
+var camera_unlocked = true; 
+
+//Lock Checks
+if splash_window {camera_unlocked = false;}
+
+//Check if camera is unlocked
+if camera_unlocked {
+
 //Middle Mouse Actions
 if mouse_check_button(mb_middle) {
 	
@@ -192,6 +209,15 @@ zoom *= power(zoom, plusminus *zoom_strength);
 //Update Mouse Previous Position
 mouse_pos_prev = mouse_pos;
 
+} else { //Splash Window
+	
+	var xrot_quat = new quat().FromAngleAxis(-0.003, world_up).Normalize();
+	view_quat = xrot_quat.Mul(view_quat).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+	
+}
+
 //Update Position
 pos = target.Add(dir.Mul(-zoom));
 
@@ -208,24 +234,149 @@ zoom_strength = max(zoom_strength, 0.001);
 //Set Font
 ImGui.PushFont(font_dnd);
 
-//Tool Bar
-ImGui.BeginMainMenuBar();
-if (ImGui.BeginMenu("Options")) {
-	if (ImGui.MenuItem("Camera Settings")) {
-		if !camera_settings_open {camera_settings_open = true;}
+//Splash Window
+if splash_window {
+	
+	var logo_size = new vec2(sprite_get_width(logo), sprite_get_height(logo));
+	var logo_scale = 0.4;
+	logo_size = logo_size.Mul(logo_scale);
+	var splash_pos = new vec2(win_w  / 2, win_h / 2).Sub(splash_offset);
+	ImGui.SetNextWindowPos(splash_pos.x, splash_pos.y, ImGuiCond.Always);
+	ImGui.Begin("Arcane Engine v0.1", splash_window, ImGuiWindowFlags.Modal | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove);
+
+	//Logo
+	ImGui.Image(logo, 0, c_white, 1, logo_size.x, logo_size.y);
+	var splash_w = ImGui.GetWindowWidth();
+	ImGui.Separator();
+
+	//Options
+	var button_width = ImGui.GetContentRegionAvailX() * 0.2;
+	ImGui.SetCursorPosX((splash_w * 0.5)  - (ImGui.CalcTextWidth("Get Started:") * 0.5));
+	ImGui.Text("Get Started:");
+	ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width)));
+	ImGui.Button("New", button_width); 
+	ImGui.SameLine();
+	ImGui.Button("Load", button_width);
+	
+	//File Name
+	ImGui.Text("Scene Name:");
+	ImGui.PushItemWidth(splash_w-15.1);
+	scene_create_name = ImGui.InputText("", scene_create_name);
+	
+	//File Directory
+	var allow_new_scene = false;
+	ImGui.Text("File Path:");
+	ImGui.PushItemWidth(splash_w-50);
+	scene_create_directory = ImGui.InputText("##label File Path", scene_create_directory); ImGui.SameLine();
+	if (ImGui.ImageButton("File Picker Button", spr_file_icon, 0, c_white, 1, c_white, 0, 18, 18)) {
+		var _dir_result = get_directory("Save Directory");
+		if string_length(_dir_result) > 0 {
+		scene_create_directory = _dir_result;
+		}
+	} 
+	ImGui.PopItemWidth();
+	var allow_new_scene = true;
+	if scene_create_directory != "Copy file path here!"  {
+	//Do Nothing
+	} else {ImGui.TextColored("**Required", c_white, 1); allow_new_scene = false;}
+	//ImGui.Separator();	
+
+	var button_disabled = true; if allow_new_scene {button_disabled = false;}
+	ImGui.BeginDisabled(button_disabled);
+	ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width * 0.5)));
+	if ImGui.Button("Create", button_width) {
+		splash_window = false;
+		dm.scene_name = scene_create_name;
+		dm.scene_directory = scene_create_directory+"/" + scene_create_name;
+		//https://yal.cc/docs/gm/non_sandboxed_filesystem/
+		if !directory_exists_ns(dm.scene_directory) {
+			directory_create_ns(dm.scene_directory)
+		}
+		nsfs_set_directory(dm.scene_directory);
+		string_save_ns("test", dm.scene_directory);
+		scene_create_name = undefined;
+		scene_create_directory = undefined;
 	}
-	if (ImGui.MenuItem("Grid Settings")) {
-		if !grid_settings_open {grid_settings_open = true;}
+	ImGui.EndDisabled();
+	
+	//Update Center Offset
+	splash_offset = new vec2(ImGui.GetWindowWidth(), ImGui.GetWindowHeight()).Mul(0.5);
+	
+	ImGui.End();
+	
+} else { //Everything else
+
+
+#region Tool Bar
+ImGui.BeginMainMenuBar();
+
+//File Tab
+if (ImGui.BeginMenu("File")) {
+	if (ImGui.MenuItem("New Scene")) {
+		//Clear Scene
+		//Offer to save
+	}
+	if (ImGui.MenuItem("Open Scene")) {
+		//Load Scene
+		//Offer to save
+	}
+	if (ImGui.MenuItem("Import Scene")) {
+		//Import Scene to add to Current
+		//Offer to save backup
+	}
+	if (ImGui.MenuItem("Recent Scenes")) {
+		//Show list of Recent Scenes which trigger a scene load if selected
+	}
+	ImGui.Separator();
+	if (ImGui.MenuItem("Save Scene")) {
+		//Save Scene
+	}
+	if (ImGui.MenuItem("Save Scene As")) {
+		//Save Scene with a new name
 	}
 	ImGui.EndMenu();
 }
+
+//Edit Tab
+if (ImGui.BeginMenu("Edit")) {
+	if (ImGui.MenuItem("Undo")) {
+		//Todo
+	}
+	if (ImGui.MenuItem("Redo")) {
+		//Todo
+	}
+	if (ImGui.MenuItem("Search")) {
+		//Todo
+	}
+	ImGui.EndMenu();
+}
+
+//Windows Tab
+if (ImGui.BeginMenu("Windows")) {
+	if (ImGui.MenuItem("Camera")) {
+		if !camera_settings_open {camera_settings_open = true;}
+	}
+	if (ImGui.MenuItem("Grid")) {
+		if !grid_settings_open {grid_settings_open = true;}
+	}
+	if (ImGui.MenuItem("Assets")) {
+		if !asset_settings_open {asset_settings_open = true;}
+	}
+	ImGui.EndMenu();
+}
+
+//Add Shortcut Buttons
+
+//End Tool Bar
 ImGui.EndMainMenuBar();
 
-//Camera Settings
+#endregion
+
+//Camera Panel
 if camera_settings_open {	
 
 	//Close Window
-	var ret = ImGui.Begin("Camera Settings", camera_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
+	var ret = ImGui.Begin("Camera", camera_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
 	camera_settings_open = ret & ImGuiReturnMask.Pointer;
 
 	//View Quaternion
@@ -278,14 +429,14 @@ if camera_settings_open {
 
 }
 
-//Grid Settings
+//Grid Panel
 if grid_settings_open {	
 
 	//Setting Updated
 	var regenerate_buffer = 0;
 	
 	//Close Window
-	var ret = ImGui.Begin("Grid Settings", grid_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
+	var ret = ImGui.Begin("Grid", grid_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
 	grid_settings_open = ret & ImGuiReturnMask.Pointer;
 
 	//Tile size
@@ -363,6 +514,66 @@ if grid_settings_open {
 	ImGui.End();
 	
 }
+ 
+ //Asset Panel
+ if asset_settings_open {
+	 
+	//Close Window
+	var ret = ImGui.Begin("Asset", asset_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
+	asset_settings_open = ret & ImGuiReturnMask.Pointer;
+	
+	//Nothing Selected
+	if global.selected_inst = noone {
+		ImGui.Text("Select an asset to view.");	
+	} else { //Asset Selected
+		
+		//Grab Instance Reference	
+		var inst = global.selected_inst;
+		
+		//Name
+		inst.name = ImGui.InputText("Name", inst.name);
+		
+		//Asset Type
+		var asset_type_str = ["Empty", "Map", "Art", "Player", "NPC"]
+		var asset_type_open = ImGui.BeginCombo("Asset Type", asset_type_str[inst.type], ImGuiComboFlags.None);
+		if asset_type_open {
+			for (var i = 0; i < array_length(asset_type_str); i++) {
+				var item = ImGui.Selectable(asset_type_str[i],,ImGuiSelectableFlags.None);
+				if item = true {
+					inst.type = i; 
+				}
+			}
+		ImGui.EndCombo();
+		}
+		
+		var transform_tree_open = ImGui.TreeNodeEx("Transform", ImGuiTreeNodeFlags.NoTreePushOnOpen);
+		if transform_tree_open {
+			
+		//Position
+		var pos_array = inst.pos.AsLinearArray();
+		ImGui.InputFloat3("Position", pos_array);
+		inst.pos.x = pos_array[0]; inst.pos.y = pos_array[1]; inst.pos.z = pos_array[2];
+	
+		//Orientation Quat
+		var orientation_quat_array = [[inst.orientation.x, inst.orientation.y], [inst.orientation.z, inst.orientation.w]];
+		ImGui.InputFloat2("Orientation Quaternion X/Y", orientation_quat_array[0],,,,ImGuiInputTextFlags.None);
+		ImGui.InputFloat2("Orientation Quaternion Z/W", orientation_quat_array[1],,,,ImGuiInputTextFlags.None);
+		inst.orientation = new quat(orientation_quat_array[0][0], orientation_quat_array[0][1], orientation_quat_array[1][0], orientation_quat_array[1][1]);
+	
+		//Scale
+		var scale_array = inst.scale.AsLinearArray();
+		ImGui.InputFloat3("Scale", scale_array);
+		inst.scale.x = scale_array[0]; inst.scale.y = scale_array[1]; inst.scale.z = scale_array[2];
+		
+		}
+
+		ImGui.TreePop();
+		
+	}
+	//End Menu
+	ImGui.End();
+	
+ }
  
 //Right Click Context Menu
 if mouse_check_button_released(mb_right) {
@@ -469,5 +680,6 @@ if create_asset_open {
 	ImGui.End();
 }
 
+}
 
 #endregion

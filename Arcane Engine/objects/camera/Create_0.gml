@@ -68,6 +68,9 @@ cam_reset();
 #macro world_y new vec3(0, 1, 0)
 #macro world_down new vec3(0, 0, -1)
 
+//Scale Vectors
+#macro default_scale new vec3(1, 1, 1)
+
 #endregion
 #region GUI 
 
@@ -75,10 +78,17 @@ cam_reset();
 ImGui.__Initialize();
 
 //Store Open Menu Status
+splash_window = true;
 camera_settings_open = false;
 grid_settings_open = false;
+asset_settings_open = false;
 right_click_open = false;
 create_asset_open = false;
+
+//Scene Creation Settings
+splash_offset = new vec2(0, 0);
+scene_create_name = "New Scene";
+scene_create_directory = "Copy file path here!";
 
 //Asset Creation Settings
 asset_create_type = 0;

@@ -27,6 +27,9 @@ vbuff = undefined;
 col_shape = undefined;
 col_dynamic = undefined;
 
+//Draw Collision Shape
+draw_col_shape = false;
+
 //Position
 pos = new vec3(0, 0, 0);
 

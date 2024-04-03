@@ -1,4 +1,4 @@
-function cm_dynamic_set_matrix(dynamic, matrix, moving) 
+function cm_dynamic_set_matrix(dynamic, matrix, moving, scale = undefined) 
 {	
 	/*	
 		This script lets you make it seem like a colmesh instance has been transformed.
@@ -24,7 +24,11 @@ function cm_dynamic_set_matrix(dynamic, matrix, moving)
 	cm_matrix_orthogonalize(M);
 	
 	//Rescale the matrix to the scale we found earlier
+	if scale = undefined {
 	cm_matrix_scale(M, CM_DYNAMIC_SCALE, CM_DYNAMIC_SCALE, CM_DYNAMIC_SCALE);
+	} else {
+	cm_matrix_scale(M, scale.x, scale.y, scale.z);
+	}
 	
 	//Store the previous inverse matrix
 	array_copy(P, 0, I, 0, 16);

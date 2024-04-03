@@ -9,6 +9,7 @@ varying vec2 outline_size;
 void main()
 {
 	vec2 outline_size = vec2(0.001, 0.001);
+	vec4 outline_color = vec4(1.0, 1.0, 1.0, 1.0);
 	vec4  spriteSample = texture2D(gm_BaseTexture, v_vTexcoord);
     float spriteAlphaL = texture2D(gm_BaseTexture, v_vTexcoord + vec2(outline_size.x, 0.0)).a;
     float spriteAlphaT = texture2D(gm_BaseTexture, v_vTexcoord + vec2(0.0, outline_size.y)).a;
@@ -26,7 +27,7 @@ void main()
 	        ||  (spriteAlphaR >= alpha_threshold)
 	        ||  (spriteAlphaB >= alpha_threshold))
 	        {
-				gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+				gl_FragColor = outline_color;
 	        }
 	    }
 	    else
@@ -41,7 +42,7 @@ void main()
 		|| (v_vTexcoord.y < outline_size) 
 		|| (v_vTexcoord.y > 1.0 - outline_size))
 		{
-			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+			gl_FragColor = outline_color;
 		}
 	}
 	else

@@ -87,15 +87,21 @@ function vec2(x = 0, y = 0) constructor {
 	}
 	
 	//Adds two vectors
-	static Add = function(vec) {
+	static Add = function(val) {
 		gml_pragma("forceinline");
-		return new vec2(self.x+vec.x, self.y+vec.y);
+		if (is_numeric(val)) {
+			return new vec2(self.x+val, self.y+val);
+		}
+		return new vec2(self.x+val.x, self.y+val.y);
 	}
 	
 	//Subtract two vectors
-	static Sub = function(vec) {
+	static Sub = function(val) {
 		gml_pragma("forceinline");
-		return new vec2(self.x-vec.x, self.y-vec.y);
+		if (is_numeric(val)) {
+			return new vec2(self.x-val, self.y-val);
+		}
+		return new vec2(self.x-val.x, self.y-val.y);
 	}
 	
 	//Multiply two vectors

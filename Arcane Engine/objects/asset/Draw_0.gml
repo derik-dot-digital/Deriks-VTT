@@ -19,17 +19,21 @@ if type = asset_types.art{
 	shader_set(shd_asset);
 	scale = new vec3(art_w, art_h, 1);
 	var object_data = [];
-	cm_dynamic_set_matrix(col_dynamic, orientation.Conjugate().AsTransformMatrix(pos, scale));
+	cm_dynamic_set_matrix(col_dynamic, orientation.Conjugate().AsTransformMatrix(pos, default_scale), false, scale);
 	object_data = array_concat(object_data, pos.AsLinearArray(), orientation.AsLinearArray(), scale.AsLinearArray());
 	array_push(object_data, global.outline_size, global.outline_size, selected);
 	var uni_object_data = shader_get_uniform(shd_asset, "object_data");
 	shader_set_uniform_f_array(uni_object_data, object_data);
 	cm_vbuff_submit(vbuff, sprite_get_texture(art, 0));
 	shader_reset();
-	shader_set(sh_cm_debug);
-	cm_debug_draw(col_dynamic);
-	shader_reset();
 	}
 }
 
+//Draw Collision Shape
+if col_dynamic != undefined and draw_col_shape {
+shader_set(sh_cm_debug);
+cm_debug_draw(col_dynamic);
+shader_reset();
+}
+	
 #endregion
