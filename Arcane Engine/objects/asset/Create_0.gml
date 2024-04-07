@@ -19,6 +19,7 @@ file_path = undefined;
 file_loaded = false;
 file_requested = false; 
 file_request_id = undefined;
+file_extension = undefined;
 
 //Store Mesh
 vbuff = undefined;

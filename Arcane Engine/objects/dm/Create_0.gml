@@ -54,4 +54,10 @@ scene_name = undefined;
 //Directory
 scene_directory = undefined;
 
+//Scene ZIP
+scene_zip = undefined;
+
+//Asset List
+dm.asset_list = ds_list_create();
+
 #endregion

@@ -107,7 +107,6 @@
     {"$GMIncludedFile":"","%Name":"Wingdings-Regular.ttf","CopyToMask":-1,"filePath":"datafiles/fonts","name":"Wingdings-Regular.ttf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"native_cursor.html","CopyToMask":-1,"filePath":"datafiles","name":"native_cursor.html","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"nsfs.html","CopyToMask":-1,"filePath":"datafiles","name":"nsfs.html","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
-    {"$GMIncludedFile":"","%Name":"nsfs.html","CopyToMask":-1,"filePath":"datafiles","name":"nsfs.html","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"window_set_icon.html","CopyToMask":-1,"filePath":"datafiles","name":"window_set_icon.html","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,

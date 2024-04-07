@@ -256,7 +256,42 @@ if splash_window {
 	ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width)));
 	ImGui.Button("New", button_width); 
 	ImGui.SameLine();
-	ImGui.Button("Load", button_width);
+	if ImGui.Button("Load", button_width) {
+		dm.scene_directory = get_open_filename("", "");
+		var file_count = zip_unzip(dm.scene_directory, working_directory);	
+		var found_file = file_find_first(working_directory + "assets/*.ini", fa_none);
+			while (found_file != "")
+			{
+			    ds_list_add(dm.asset_list, working_directory + "assets/" + found_file);
+			    found_file = file_find_next();
+			}
+		file_find_close();
+		for (var i = 0; i < ds_list_size(dm.asset_list); i++) {
+			show_debug_message(file_exists(ds_list_find_value(dm.asset_list, i)));
+			ini_open(ds_list_find_value(dm.asset_list, i));
+			var asset_inst = instance_create_depth(0, 0, 0, asset);
+			asset_inst.name = ini_read_string("Data", "name", "undefined");
+			asset_inst.type = ini_read_real("Data", "type", 0);
+			asset_inst.file_path = ini_read_string("Data", "path", "undefined");
+			asset_inst.file_extension = str_check_compatable_file_type(asset_inst.file_path);
+			asset_inst.pos.x = ini_read_real("Position", "x", 0);
+			asset_inst.pos.y = ini_read_real("Position", "y", 0);
+			asset_inst.pos.z = ini_read_real("Position", "z", 0);
+			asset_inst.orientation.x = ini_read_real("Orientation", "x", 0);
+			asset_inst.orientation.y = ini_read_real("Orientation", "y", 0);
+			asset_inst.orientation.z = ini_read_real("Orientation", "z", 0);
+			asset_inst.orientation.w = ini_read_real("Orientation", "w", 1);
+		
+			ini_close();
+
+		}
+		//Reset Scene Creation Settings
+		scene_create_name = "New Scene";
+		scene_create_directory = "Copy file path here!";
+		
+		//Exit Splash Window
+		splash_window = false;
+	}
 	
 	//File Name
 	ImGui.Text("Scene Name:");
@@ -285,17 +320,23 @@ if splash_window {
 	ImGui.BeginDisabled(button_disabled);
 	ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width * 0.5)));
 	if ImGui.Button("Create", button_width) {
+		
+		//Exit Splash Window
 		splash_window = false;
+		
+		//Store Scene Name
 		dm.scene_name = scene_create_name;
-		dm.scene_directory = scene_create_directory+"/" + scene_create_name;
-		//https://yal.cc/docs/gm/non_sandboxed_filesystem/
-		if !directory_exists_ns(dm.scene_directory) {
-			directory_create_ns(dm.scene_directory)
-		}
-		nsfs_set_directory(dm.scene_directory);
-		string_save_ns("test", dm.scene_directory);
-		scene_create_name = undefined;
-		scene_create_directory = undefined;
+		
+		//Store Scene Save Directory
+		dm.scene_directory = scene_create_directory;
+		
+		//Store Scene Save .ZIP
+		dm.scene_zip = zip_create();
+		
+		//Reset Scene Creation Settings
+		scene_create_name = "New Scene";
+		scene_create_directory = "Copy file path here!";
+		
 	}
 	ImGui.EndDisabled();
 	
@@ -304,8 +345,9 @@ if splash_window {
 	
 	ImGui.End();
 	
-} else { //Everything else
-
+} 
+else  //Everything else
+{
 
 #region Tool Bar
 ImGui.BeginMainMenuBar();
@@ -329,7 +371,16 @@ if (ImGui.BeginMenu("File")) {
 	}
 	ImGui.Separator();
 	if (ImGui.MenuItem("Save Scene")) {
-		//Save Scene
+		
+		//Add Settings to .ZIP
+		//Camera + Grid + GUI 
+		
+		//Add Assets to .ZIP
+		with(asset) {event_user(0);}
+		
+		//Save .ZIP
+		zip_save(dm.scene_zip, dm.scene_directory + dm.scene_name + ".zip")
+		
 	}
 	if (ImGui.MenuItem("Save Scene As")) {
 		//Save Scene with a new name
@@ -631,7 +682,8 @@ if create_asset_open {
 	var allow_creation = true;
 	if asset_create_filepath != "Copy file path here!"  {
 		if file_exists(asset_create_filepath) {
-		if !str_check_compatable_file_type(asset_create_filepath) {
+		asset_create_extension = str_check_compatable_file_type(asset_create_filepath);
+		if asset_create_extension = undefined {
 		ImGui.TextColored("**Invalid File Type", c_red, 1);	
 		allow_creation = false;
 		}
@@ -650,11 +702,13 @@ if create_asset_open {
 		new_inst.name = asset_create_name;
 		new_inst.type = asset_types.art;
 		new_inst.file_path = asset_create_filepath;
+		new_inst.file_extension = asset_create_extension;
 		
 		//Reset Values
 		asset_create_type = 0;
 		asset_create_name = "Type name here!";
 		asset_create_filepath = "Copy file path here!";
+		asset_create_extension = undefined;
 		
 		//Close Menu
 		create_asset_open = false;
@@ -670,6 +724,7 @@ if create_asset_open {
 		asset_create_type = 0;
 		asset_create_name = "Type name here!";
 		asset_create_filepath = "Copy file path here!";
+		asset_create_extension = undefined;
 		
 		//Close Menu
 		create_asset_open = false;

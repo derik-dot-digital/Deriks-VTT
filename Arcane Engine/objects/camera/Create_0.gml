@@ -94,6 +94,7 @@ scene_create_directory = "Copy file path here!";
 asset_create_type = 0;
 asset_create_name = "Type name here!";
 asset_create_filepath = "Copy file path here!";
+asset_create_extension = undefined;
 
 //Add Fonts
 font_default = ImGui.AddFontDefault();
