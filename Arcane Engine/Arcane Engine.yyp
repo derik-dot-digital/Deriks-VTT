@@ -355,6 +355,7 @@
     {"id":{"name":"matrix_orthogonalize","path":"scripts/matrix_orthogonalize/matrix_orthogonalize.yy",},},
     {"id":{"name":"native_cursor_extras","path":"scripts/native_cursor_extras/native_cursor_extras.yy",},},
     {"id":{"name":"scr_dmrvbm","path":"scripts/scr_dmrvbm/scr_dmrvbm.yy",},},
+    {"id":{"name":"save_sprite_manual","path":"scripts/save_sprite_manual/save_sprite_manual.yy",},},
     {"id":{"name":"str_check_compatable_file_type","path":"scripts/str_check_compatable_file_type/str_check_compatable_file_type.yy",},},
     {"id":{"name":"sh_cm_debug","path":"shaders/sh_cm_debug/sh_cm_debug.yy",},},
     {"id":{"name":"sh_shadow","path":"shaders/sh_shadow/sh_shadow.yy",},},

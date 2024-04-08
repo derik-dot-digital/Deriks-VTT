@@ -1,7 +1,7 @@
 #region Save Object Data to .ZIP
 
 //Save Sprite 
-zip_add_file(dm.scene_zip, "assets/"+name+file_extension, "assets/"+ name + ".png"); //PNG Workaround for save_sprite
+zip_add_file(dm.scene_zip, "assets/"+name+file_extension, file_path); 
 
 //Save Data
 ini_open("assets/"+name+".ini");
