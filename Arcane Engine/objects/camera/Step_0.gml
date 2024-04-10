@@ -155,6 +155,7 @@ var camera_unlocked = true;
 
 //Lock Checks
 if splash_window {camera_unlocked = false;}
+if zip_save_status != undefined {camera_unlocked = false;}
 
 //Check if camera is unlocked
 if camera_unlocked {
@@ -248,189 +249,99 @@ if splash_window {
 	ImGui.Image(logo, 0, c_white, 1, logo_size.x, logo_size.y);
 	var splash_w = ImGui.GetWindowWidth();
 	ImGui.Separator();
-
+	
 	//Options
 	var button_width = ImGui.GetContentRegionAvailX() * 0.2;
-	ImGui.SetCursorPosX((splash_w * 0.5)  - (ImGui.CalcTextWidth("Get Started:") * 0.5));
+	ImGui.SetCursorPosX((splash_w * 0.5)  - (ImGui.CalcTextWidth("Get Started:") * 0.5)); 
 	ImGui.Text("Get Started:");
-	ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width)));
-	ImGui.Button("New", button_width); 
-	ImGui.SameLine();
-	if ImGui.Button("Load", button_width) {
-		
-		//Select Scene .ZIP
-		dm.scene_directory = get_open_filename("", "");
-	
-		//Check if file exists
-		if file_exists(dm.scene_directory) {
-			//ADD CHECKS FOR IF FILE IS VALID
-			//IF NOT SHOW ERROR AND REMAIN ON SPLASH SCREEN
-			
-		//Get File Count (.ZIPs are unloaded to working directory)
-		var file_count = zip_unzip(dm.scene_directory, working_directory);
-		
-		//Detect Scene Config 
-		var found_config = file_find_first(working_directory + "/*scene_config.ini", fa_none);
-		show_debug_message(found_config)
-		
-		//Load & Apply Config
-		if found_config != "" { 
+	if (ImGui.BeginTabBar("Splash Menu Options")) {
 
-			//Open Config .INI
-			ini_open(found_config);
-		
-			//Camera Data
-			view_quat.x = ini_read_real("View Quat", "x", view_quat.x);
-			view_quat.y = ini_read_real("View Quat", "y", view_quat.y);
-			view_quat.z =  ini_read_real("View Quat", "z", view_quat.z);
-			view_quat.w =  ini_read_real("View Quat", "w", view_quat.w);
-			pos.x = ini_read_real("Camera Position", "x", pos.x);
-			pos.y = ini_read_real("Camera Position", "y", pos.y);
-			pos.z = ini_read_real("Camera Position", "z", pos.z);
-			target.x = ini_read_real("Camera Target", "x", target.x);
-			target.y = ini_read_real("Camera Target", "y", target.y);
-			target.z = ini_read_real("Camera Target", "z", target.z);
-			dir.x = ini_read_real("Camera Direction", "x", dir.x);
-			dir.y = ini_read_real("Camera Direction", "y", dir.y);
-			dir.z = ini_read_real("Camera Direction", "z", dir.z);
-			up.x = ini_read_real("Camera Up", "x", up.x);
-			up.y = ini_read_real("Camera Up", "y", up.y);
-			up.z = ini_read_real("Camera Up", "z", up.z);
-			fov = ini_read_real("Projection Settings", "fov", fov);
-			znear_perspective = ini_read_real("Projection Settings", "znear_perspective", znear_perspective);
-			znear_ortho = ini_read_real("Projection Settings", "znear_orthographic", znear_ortho);
-			zfar = ini_read_real("Projection Settings", "zfar", zfar);
-			projection_slider = ini_read_real("Projection Settings", "projection_slider", projection_slider);
-			zoom = ini_read_real("Projection Settings", "zoom", zoom);
-			zoom_strength = ini_read_real("Projection Settings", "zoom_strength", zoom_strength);
+    if (ImGui.BeginTabItem("New")) or reset_tab_selection
+        {
+			
+			var allow_new_scene = true;
+						
+			//File Name
+			ImGui.Text("Scene Name:");
+			ImGui.PushItemWidth(splash_w-15.1);
+			scene_create_name = ImGui.InputText("##label scene creation name", scene_create_name);
+			if file_exists_ns(scene_create_directory+scene_create_name+".zip") {
+				allow_new_scene = false;
+				ImGui.TextColored("**Scene name already in use in this directory", c_red, 1);
+			}
+			
+			//Save Directory
+			ImGui.Text("Save Directory:");
+			ImGui.PushItemWidth(splash_w-28-ImGui.GetFrameHeight());
+			scene_create_directory = ImGui.InputText("##label File Path", scene_create_directory); ImGui.SameLine();
+			
+			if (ImGui.ImageButton("File Picker Button", spr_file_icon, 0, c_white, 1, c_white, 0, ImGui.GetFrameHeight(), ImGui.GetFrameHeight())) {
+				var _dir_result = get_directory("Save Directory");
+				if string_length(_dir_result) > 0 {
+				scene_create_directory = _dir_result;
+				}
+			} 
+			ImGui.PopItemWidth();
+			if scene_create_directory = default_scene_directory {
+			ImGui.TextColored("**Required", c_white, 1); 
+			}
+			if !directory_exists_ns(scene_create_directory) {ImGui.TextColored("**Directory does not exist.", c_red, 1);}		
 
-			//Grid Data
-			grid.grid_size = ini_read_real("Grid Settings", "grid_size", grid.grid_size);
-			grid.tile_size = ini_read_real("Grid Settings", "tile_size", grid.tile_size);
-			grid.depth_mode = ini_read_string("Grid Settings", "depth_mode", grid.depth_mode);
-			grid.color_mode = ini_read_real("Grid Settings", "color_mode", grid.color_mode);
-			grid.grid_color.x = ini_read_real("Grid Settings", "grid_color_red", grid.grid_color.x);
-			grid.grid_color.y = ini_read_real("Grid Settings", "grid_color_green", grid.grid_color.y);
-			grid.grid_color.z = ini_read_real("Grid Settings", "grid_color_blue", grid.grid_color.z);
-			grid.grid_color.w = ini_read_real("Grid Settings", "grid_color_alpha", grid.grid_color.w);
-			grid.rainbow_color_scale = ini_read_real("Grid Settings", "rainbow_color_scale", grid.rainbow_color_scale);
-			grid.rainbow_color_spd = ini_read_real("Grid Settings", "rainbow_color_spd", grid.rainbow_color_spd);
-
-			//Close .INI
-			ini_close();
-			
-		}
+			var button_disabled = true; if allow_new_scene {button_disabled = false;}
+			ImGui.BeginDisabled(button_disabled);
+			ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width * 0.5)));
+			if ImGui.Button("Create", button_width) {
 		
-		//Detect Assets
-		var found_file = file_find_first(working_directory + "assets/*.ini", fa_none);
+				//Exit Splash Window
+				splash_window = false;
 		
-		//Set Scene name & Directory
-		dm.scene_name = filename_name(dm.scene_directory); //Remove Directory
-		dm.scene_directory = string_replace(dm.scene_directory, dm.scene_name, ""); //Remove .ZIP name from the path chosen earlier
-		dm.scene_name = string_replace(dm.scene_name, ".zip", ""); //Remove file extension
+				//Store Scene Name
+				dm.scene_name = scene_create_name;
 		
-		//Store Found .INI files in list
-		while (found_file != "")
-		{
-			ds_list_add(dm.asset_list, working_directory + "assets/" + found_file);
-			found_file = file_find_next();
-		}
+				//Store Scene Save Directory
+				dm.scene_directory = scene_create_directory;
 		
-		//Close out file search
-		file_find_close();
-				 
-		//Spawn Assets
-		for (var i = 0; i < ds_list_size(dm.asset_list); i++) {
-			
-			//Store Current .INI path
-			var current_ini = ds_list_find_value(dm.asset_list, i)
-			
-			//Open Asset .INI
-			ini_open(current_ini);
-			
-			//Spawn Instance
-			var asset_inst = instance_create_depth(0, 0, 0, asset);
-			
-			//Load Data & Apply to Instance
-			asset_inst.name = ini_read_string("Data", "name", "undefined");
-			asset_inst.type = ini_read_real("Data", "type", 0);
-			asset_inst.file_path = ini_read_string("Data", "path", "undefined");
-			asset_inst.file_extension = str_check_compatable_file_type(asset_inst.file_path);
-			asset_inst.pos.x = ini_read_real("Position", "x", 0);
-			asset_inst.pos.y = ini_read_real("Position", "y", 0);
-			asset_inst.pos.z = ini_read_real("Position", "z", 0);
-			asset_inst.orientation.x = ini_read_real("Orientation", "x", 0);
-			asset_inst.orientation.y = ini_read_real("Orientation", "y", 0);
-			asset_inst.orientation.z = ini_read_real("Orientation", "z", 0);
-			asset_inst.orientation.w = ini_read_real("Orientation", "w", 1);
-		
-			//Close .INI
-			ini_close();
+				//Store Scene Save .ZIP
+				dm.scene_zip = zip_create();
 				
-		}
+				//Reset Camera
+				cam_reset();
+				
+				//Reset Splash Menu
+				splash_menu_reset();
+		
+			}
+			ImGui.EndDisabled();
 			
-		//Fresh .ZIP for session
-		dm.scene_zip = zip_create();
-		
-		//Reset Scene Creation Settings (Incase they were changed before loading)
-		scene_create_name = "New Scene";
-		scene_create_directory = "Copy file path here!";
-		
-		//Exit Splash Window
-		splash_window = false;
-		
-		} else {
-			//Need to show an error or something
-		}	
-	}
-	
-	//File Name
-	ImGui.Text("Scene Name:");
-	ImGui.PushItemWidth(splash_w-15.1);
-	scene_create_name = ImGui.InputText("", scene_create_name);
-	
-	//File Directory
-	var allow_new_scene = false;
-	ImGui.Text("File Path:");
-	ImGui.PushItemWidth(splash_w-50);
-	scene_create_directory = ImGui.InputText("##label File Path", scene_create_directory); ImGui.SameLine();
-	if (ImGui.ImageButton("File Picker Button", spr_file_icon, 0, c_white, 1, c_white, 0, 18, 18)) {
-		var _dir_result = get_directory("Save Directory");
-		if string_length(_dir_result) > 0 {
-		scene_create_directory = _dir_result;
+            ImGui.EndTabItem();
+        }
+	if (ImGui.BeginTabItem("Load"))
+    {
+		ImGui.Text("Recent Scenes:");
+		ImGui.SameLine();
+		ImGui.SetCursorPosX(((splash_w-button_width)-ImGuiStyleVar.FramePadding)+3)
+		if ImGui.Button("Open", button_width) {load_scene();}
+		ImGui.Separator();
+		ImGui.BeginListBox("##label recent scenes", ImGui.GetContentRegionAvailX(), ImGui.GetContentRegionAvailY());
+		var first_result = file_find_first_ns(default_scene_directory + "/*.zip");
+		var current_result = first_result
+		while current_result != "" {
+				var scene_selected = ImGui.Selectable(filename_name(current_result),,ImGuiSelectableFlags.AllowDoubleClick);
+				//See if you can make this work on a double click instead of a single
+				if scene_selected {load_scene(default_scene_directory + current_result); splash_menu_reset(); break;}
+				current_result = file_find_next_ns();
 		}
-	} 
-	ImGui.PopItemWidth();
-	var allow_new_scene = true;
-	if scene_create_directory != "Copy file path here!"  {
-	//Do Nothing
-	} else {ImGui.TextColored("**Required", c_white, 1); allow_new_scene = false;}
-	//ImGui.Separator();	
-
-	var button_disabled = true; if allow_new_scene {button_disabled = false;}
-	ImGui.BeginDisabled(button_disabled);
-	ImGui.SetCursorPosX((splash_w * 0.5)  - (1 + (button_width * 0.5)));
-	if ImGui.Button("Create", button_width) {
+		file_find_close_ns()
+		ImGui.EndListBox();
+        ImGui.EndTabItem();
+    }
 		
-		//Exit Splash Window
-		splash_window = false;
-		
-		//Store Scene Name
-		dm.scene_name = scene_create_name;
-		
-		//Store Scene Save Directory
-		dm.scene_directory = scene_create_directory;
-		
-		//Store Scene Save .ZIP
-		dm.scene_zip = zip_create();
-		
-		//Reset Scene Creation Settings
-		scene_create_name = "New Scene";
-		scene_create_directory = "Copy file path here!";
-		
-	}
-	ImGui.EndDisabled();
+	//Allows Tab Selected to be reset on splash_reset();
+	reset_tab_selection = false;
 	
+	ImGui.EndTabBar();
+	}
+		
 	//Update Center Offset
 	splash_offset = new vec2(ImGui.GetWindowWidth(), ImGui.GetWindowHeight()).Mul(0.5);
 	
@@ -446,35 +357,51 @@ ImGui.BeginMainMenuBar();
 //File Tab
 if (ImGui.BeginMenu("File")) {
 	if (ImGui.MenuItem("New Scene")) {
-		//Clear Scene
-		//Offer to save
+		//Add Confirmation/Save Current popup
+		clear_scene();
+		cam_reset();
+		splash_menu_reset();
+		splash_window = true;
 	}
 	if (ImGui.MenuItem("Open Scene")) {
-		//Load Scene
-		//Offer to save
+		//Add Confirmation/Save Current popup
+		load_scene();
 	}
 	if (ImGui.MenuItem("Import Scene")) {
+		//Add Confirmation/Save Current popup
 		//Import Scene to add to Current
-		//Offer to save backup
+		load_scene(undefined, true);
 	}
-	if (ImGui.MenuItem("Recent Scenes")) {
-		//Show list of Recent Scenes which trigger a scene load if selected
+	if (ImGui.BeginMenu("Recent Scenes")) {
+		
+		//TODO: Add Save Confirmation
+		var first_result = file_find_first_ns(default_scene_directory + "/*.zip");
+		var current_result = first_result
+		while current_result != "" {
+				var display_str = string_replace(current_result, ".zip", "");
+				var scene_selected = ImGui.MenuItem(filename_name(display_str));
+				if scene_selected {load_scene(default_scene_directory + current_result); splash_menu_reset(); break;}
+				current_result = file_find_next_ns();
+		}
+		file_find_close_ns()
+
+		ImGui.EndMenu();
 	}
 	ImGui.Separator();
 	if (ImGui.MenuItem("Save Scene")) {
-		
-		//Save Scene Config
-		with(camera) {event_user(0);}
-		
-		//Add Assets to .ZIP
-		with(asset) {event_user(0);}
-
-		//Save .ZIP
-		zip_save(dm.scene_zip, dm.scene_directory + dm.scene_name + ".zip")
-		
+		save_scene();
 	}
 	if (ImGui.MenuItem("Save Scene As")) {
-		//Save Scene with a new name
+		var new_dir = get_directory("Save Directory");
+		if new_dir != "" {
+			dm.scene_directory = new_dir;
+			save_scene();
+		}
+	}
+	ImGui.Separator();
+	if (ImGui.MenuItem("Exit")) {
+		//TODO: Add save/confirmation popup
+		game_end();	
 	}
 	ImGui.EndMenu();
 }
@@ -672,8 +599,18 @@ if grid_settings_open {
 		//Grab Instance Reference	
 		var inst = global.selected_inst;
 		
-		//Name
-		inst.name = ImGui.InputText("Name", inst.name);
+		//Name (Avoids Duplicates)
+		var new_name = ImGui.InputText("Name", inst.name);
+		var name_taken = false;
+		for (var i = 0; i < instance_number(asset); i++) {
+			var _inst = instance_find(asset, i);
+			if _inst != global.selected_inst {
+				if new_name = _inst.name{
+				name_taken = true;	
+				}
+			}
+		}
+		if !name_taken {inst.name = new_name}else{ImGui.TextColored("**Duplicate name, will not be applied.", c_red, 1);}
 		
 		//Asset Type
 		var asset_type_str = ["Empty", "Map", "Art", "Player", "NPC"]
@@ -753,9 +690,17 @@ if right_click_open {
 if create_asset_open {
 	if (ImGui.Begin("Create Asset",, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoDecoration)) {
 		
-	//Asset Name
-	ImGui.Text("Asset Name:");
-	asset_create_name = ImGui.InputText("##label Asset Name", asset_create_name);
+	//Asset Name (Avoids Duplicates)
+	ImGui.Text("Asset Name:"); var allow_creation = true;
+	var new_name = ImGui.InputText("##label Asset Name", asset_create_name);
+	var name_taken = false;
+	for (var i = 0; i < instance_number(asset); i++) {
+		var _inst = instance_find(asset, i);
+			if new_name = _inst.name{
+			name_taken = true;	
+		}
+	}
+	if !name_taken {asset_create_name = new_name}else{ImGui.TextColored("**Duplicate name, cannot be used.", c_red, 1); allow_creation = false;}
 	ImGui.Separator();	
 	
 	//Asset Type
@@ -768,16 +713,21 @@ if create_asset_open {
 	
 	//Asset File
 	ImGui.Text("File Path:");
+	ImGui.PushItemWidth(ImGui.GetContentRegionMaxX()-20-ImGui.GetFrameHeight());
 	asset_create_filepath = ImGui.InputText("##label File Path", asset_create_filepath); ImGui.SameLine();
-	if (ImGui.ImageButton("File Picker Button", spr_file_icon, 0, c_white, 1, c_white, 0, 18, 18)) {asset_create_filepath = get_open_filename("", "");} //Add Supported Files to filter one day
-	var allow_creation = true;
+	if (ImGui.ImageButton("File Picker Button", spr_file_icon, 0, c_white, 1, c_white, 0, ImGui.GetFrameHeight(), ImGui.GetFrameHeight())) {
+		
+		//Add a State Machine here that opens the file prompt with different filters for different asset types
+		asset_create_filepath = get_open_filename_ext("Image Files|*.png;*.jpeg;*.jpg;*.gif;","", user_images, "Select Asset Image");
+		
+	}
 	if asset_create_filepath != "Copy file path here!"  {
 		if file_exists(asset_create_filepath) {
 		asset_create_extension = str_check_compatable_file_type(asset_create_filepath);
-		if asset_create_extension = undefined {
-		ImGui.TextColored("**Invalid File Type", c_red, 1);	
-		allow_creation = false;
-		}
+			if asset_create_extension = undefined {
+			ImGui.TextColored("**Invalid File Type", c_red, 1);	
+			allow_creation = false;
+			}
 		} else {
 			ImGui.TextColored("**File not found", c_red, 1);
 			allow_creation = false;
@@ -824,6 +774,60 @@ if create_asset_open {
 	
 	}
 	ImGui.End();
+} else {
+	asset_create_name = "New Asset";
+	var default_asset_name_str = "";
+	var default_asset_count = 0;
+	var default_name_match = true;
+	while default_name_match {
+		var default_match_found = false;
+		for (var i = 0; i < instance_number(asset); i++) {
+			var _inst = instance_find(asset, i);
+			if _inst.name =  "New Asset" + default_asset_name_str {
+				if default_asset_name_str = "" {
+				default_asset_name_str = " " + string(default_asset_count);
+				} else {
+				default_asset_count++;
+				default_asset_name_str = " " + string(default_asset_count);
+				}
+				default_match_found = true;
+			}
+		}
+		if !default_match_found {default_name_match = false;}
+	}
+	asset_create_name = "New Asset" + default_asset_name_str;
+}
+
+//Saving
+switch(zip_save_status) {
+
+	//Save in Progress
+	case "saving":
+	var save_pos = new vec2(win_w  / 2, win_h / 2).Sub(save_offset);
+	ImGui.SetNextWindowPos(save_pos.x, save_pos.y, ImGuiCond.Always);
+	ImGui.Begin("Saving Scene", true, ImGuiWindowFlags.Modal | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove);
+	var warning_str = "Do not close program";
+	var warning_offset = ImGui.CalcTextWidth(warning_str);
+	//ImGui.SetCursorPosX((save_pos.x * 0.5)  - warning_offset);
+	ImGui.Text(warning_str);
+	save_offset = new vec2(ImGui.GetWindowWidth(), ImGui.GetWindowHeight()).Mul(0.5);
+	ImGui.End();
+	break;
+
+	//Save Failed
+	case "failed":
+	var save_pos = new vec2(win_w  / 2, win_h / 2).Sub(save_offset);
+	ImGui.SetNextWindowPos(save_pos.x, save_pos.y, ImGuiCond.Always);
+	ImGui.Begin("Saving Failed", true, ImGuiWindowFlags.Modal | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove);
+	var warning_str = "Save Failed";
+	var warning_offset = ImGui.CalcTextWidth(warning_str);
+	//ImGui.SetCursorPosX((save_pos.x * 0.5)  - warning_offset);
+	ImGui.Text(warning_str);
+	if ImGui.Button("Okay") {zip_save_status = undefined;}
+	save_offset = new vec2(ImGui.GetWindowWidth(), ImGui.GetWindowHeight()).Mul(0.5);
+	ImGui.End();
+	break;
+	
 }
 
 }

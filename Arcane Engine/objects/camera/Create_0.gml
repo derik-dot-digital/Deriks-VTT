@@ -71,13 +71,21 @@ cam_reset();
 //Scale Vectors
 #macro default_scale new vec3(1, 1, 1)
 
+//Directorys & File Paths
+#macro user_documents directory_get_documents_path()
+#macro user_images directory_get_pictures_path()
+#macro working_dir directory_get_current_working()
+#macro asset_directory working_dir+"assets\\"
+#macro default_scene_directory user_documents+"Arcane Engine\\"
+if !directory_exists_ns(default_scene_directory) {directory_create_ns(default_scene_directory);}
+
 #endregion
 #region GUI 
 
 //Initialize ImGui
 ImGui.__Initialize();
 
-//Store Open Menu Status
+//Menu Switches
 splash_window = true;
 camera_settings_open = false;
 grid_settings_open = false;
@@ -85,16 +93,36 @@ asset_settings_open = false;
 right_click_open = false;
 create_asset_open = false;
 
-//Scene Creation Settings
+//Scene Creation 
 splash_offset = new vec2(0, 0);
+function splash_menu_reset() {
+reset_tab_selection = true;
+scene_create_directory = default_scene_directory;
 scene_create_name = "New Scene";
-scene_create_directory = "Copy file path here!";
+var default_scene_str = "";
+var default_scene_count = 0;
+while (file_exists_ns(scene_create_directory+scene_create_name+default_scene_str+".zip")) {
+	if default_scene_str = "" {
+	default_scene_str = " " + string(default_scene_count);
+	} else {
+	default_scene_count++;
+	default_scene_str = " " + string(default_scene_count);
+	}
+}
+scene_create_name += default_scene_str;
+}
+splash_menu_reset();
 
-//Asset Creation Settings
+//Asset Creation 
 asset_create_type = 0;
-asset_create_name = "Type name here!";
+asset_create_name = "New Asset";
 asset_create_filepath = "Copy file path here!";
 asset_create_extension = undefined;
+
+//Saving/Loading 
+zip_save_id = undefined;
+zip_save_status = undefined;
+save_offset = new vec2(0, 0);
 
 //Add Fonts
 font_default = ImGui.AddFontDefault();

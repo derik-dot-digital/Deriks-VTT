@@ -57,7 +57,7 @@ scene_directory = undefined;
 //Scene ZIP
 scene_zip = undefined;
 
-//Asset List
+//Asset List used for saving/loading
 dm.asset_list = ds_list_create();
 
 #endregion
