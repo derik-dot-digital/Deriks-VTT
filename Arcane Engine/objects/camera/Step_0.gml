@@ -681,6 +681,21 @@ if skybox_settings_open {
 	ImGui.EndCombo();
 	}
 	
+	
+	//Dynamic Blend Mode
+	if skybox.mode = skybox_modes.dynamic {
+		dynamic_style_str_array = ["Solid", "Gradient"];
+		var skybox_mode_open = ImGui.BeginCombo("Style", dynamic_style_str_array[skybox.dynamic_style], ImGuiComboFlags.None);
+		if skybox_mode_open {
+			for (var i = 0; i < array_length(dynamic_style_str_array); i++) {
+				var item = ImGui.Selectable(dynamic_style_str_array[i],,ImGuiSelectableFlags.None);
+				if item = true {skybox.dynamic_style = i;}
+			}
+		ImGui.EndCombo();
+		}
+	}
+	
+	
 	//Solid Color
 	switch (skybox.mode) 
 	{

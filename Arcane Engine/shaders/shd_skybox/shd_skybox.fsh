@@ -1,7 +1,7 @@
 
 varying vec2 v_vTexcoord;
 varying vec4 v_vColour;
-uniform float uniform_array[11];
+uniform float uniform_array[10];
 varying vec3 world_normal;
 
 //Perception Based Color Mixing
@@ -31,31 +31,30 @@ vec3 oklab_mix(vec3 lin1, vec3 lin2, float a)
 void main()
 	{
 	
-	//Store Color 
+	//Store Color & Mode
 	vec4 result = vec4(0.0, 0.0, 0.0, 1.0);
-	float mode = uniform_array[9];
 	
 	#region Standard
-	if (mode == 0.0) {
+	
 	//Get Settings
 	vec4 day_color = vec4(uniform_array[0], uniform_array[1], uniform_array[2], 1.0);
 	vec4 night_color = vec4(uniform_array[3], uniform_array[4], uniform_array[5], 1.0);
 	vec3 sun_dir = normalize(-vec3(uniform_array[6], uniform_array[7], uniform_array[8]));
-	float sun_dot = dot(world_normal, sun_dir)+0.5;
-	float dynamic_blend_mode = uniform_array[10];
+	float sun_dot = dot(world_normal, sun_dir);
+	float dynamic_style = uniform_array[9];
 	
-		//Solid
-		if (dynamic_blend_mode == 0.0) {
-			result = vec4(oklab_mix(night_color.rgb, day_color.rgb, dot(sun_dir, vec3(0.0, 0.0, 1.0))), 1.0);
-		}
-		else
-		{
-			//Blend
-			if (dynamic_blend_mode == 1.0) {
-				result = vec4(oklab_mix(night_color.rgb, day_color.rgb, sun_dot), 1.0);
-			}
+	//Solid
+	if (dynamic_style == 0.0) {
+		result = vec4(oklab_mix(night_color.rgb, day_color.rgb, dot(sun_dir, vec3(0.0, 0.0, 1.0))), 1.0);
+	}
+	else
+	{
+		//Gradient
+		if (dynamic_style == 1.0) {
+			result = vec4(oklab_mix(night_color.rgb, day_color.rgb, sun_dot), 1.0);
 		}
 	}
+	
 	#endregion
 	
 	//Render Resutlt

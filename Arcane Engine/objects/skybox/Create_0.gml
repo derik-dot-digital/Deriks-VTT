@@ -18,16 +18,11 @@ enabled = false;
 color = c_black;
 rainbow_spd = 0;
 rainbow_frame = 0
-enum skybox_dynamic_color_blend {
-	solid,	
-	even
+enum skybox_dynamic_styles {
+	solid,
+	gradient
 }
-enum skybox_dynamic_shader_modes {
-	standard,
-	space
-}
-dynamic_blend_mode = skybox_dynamic_color_blend.even;
-dynamic_shader_mode = skybox_dynamic_shader_modes.standard;
+dynamic_style = skybox_dynamic_styles.solid;
 sun_vector = world_up.Negate();
 
 //Store vBuffer Values

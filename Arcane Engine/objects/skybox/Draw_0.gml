@@ -13,8 +13,8 @@ if enabled {
 		var c_day = new vec3(135, 206, 235).ColortoShader();
 		var c_night = new vec3(0, 0, 0);
 		var settings_array = [];
-		var variables = [dynamic_shader_mode, dynamic_blend_mode];
-		settings_array = array_concat(c_day.AsLinearArray(), c_night.AsLinearArray(), sun_vector.AsLinearArray());
+		var variables = [dynamic_style];
+		settings_array = array_concat(c_day.AsLinearArray(), c_night.AsLinearArray(), sun_vector.AsLinearArray(), variables);
 		shader_set_uniform_f_array(uni_array, settings_array);
 		vertex_submit(vbuff, pr_trianglelist, vbuff_tex);
 		matrix_set(matrix_world, mat_default);
