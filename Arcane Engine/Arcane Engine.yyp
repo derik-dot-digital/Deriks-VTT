@@ -138,6 +138,7 @@
     {"id":{"name":"oColmesh2DemoSphere","path":"objects/oColmesh2DemoSphere/oColmesh2DemoSphere.yy",},},
     {"id":{"name":"oColmesh2DemoTorus","path":"objects/oColmesh2DemoTorus/oColmesh2DemoTorus.yy",},},
     {"id":{"name":"oColmeshDemo221","path":"objects/oColmeshDemo221/oColmeshDemo221.yy",},},
+    {"id":{"name":"skybox","path":"objects/skybox/skybox.yy",},},
     {"id":{"name":"rm_demo","path":"rooms/rm_demo/rm_demo.yy",},},
     {"id":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
     {"id":{"name":"table","path":"rooms/table/table.yy",},},
@@ -363,6 +364,7 @@
     {"id":{"name":"str_check_compatable_file_type","path":"scripts/str_check_compatable_file_type/str_check_compatable_file_type.yy",},},
     {"id":{"name":"sh_cm_debug","path":"shaders/sh_cm_debug/sh_cm_debug.yy",},},
     {"id":{"name":"sh_shadow","path":"shaders/sh_shadow/sh_shadow.yy",},},
+    {"id":{"name":"shd_skybox","path":"shaders/shd_skybox/shd_skybox.yy",},},
     {"id":{"name":"shd_asset","path":"shaders/shd_asset/shd_asset.yy",},},
     {"id":{"name":"shd_grid","path":"shaders/shd_grid/shd_grid.yy",},},
     {"id":{"name":"shd_quaternion","path":"shaders/shd_quaternion/shd_quaternion.yy",},},
@@ -378,8 +380,8 @@
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
     {"roomId":{"name":"table","path":"rooms/table/table.yy",},},
-    {"roomId":{"name":"rm_demo","path":"rooms/rm_demo/rm_demo.yy",},},
     {"roomId":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
+    {"roomId":{"name":"rm_demo","path":"rooms/rm_demo/rm_demo.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[

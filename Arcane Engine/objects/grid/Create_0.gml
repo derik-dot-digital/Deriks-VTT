@@ -1,5 +1,8 @@
 #region Initialize 
 
+//Toggle
+enabled = true;
+
 //Sizes
 tile_size = 50;
 grid_size = 100;

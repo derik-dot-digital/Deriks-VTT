@@ -71,6 +71,9 @@ cam_reset();
 //Scale Vectors
 #macro default_scale new vec3(1, 1, 1)
 
+//Matrices
+#macro mat_default matrix_build_identity()
+
 //Directorys & File Paths
 #macro user_documents directory_get_documents_path()
 #macro user_images directory_get_pictures_path()
@@ -92,6 +95,7 @@ grid_settings_open = false;
 asset_settings_open = false;
 right_click_open = false;
 create_asset_open = false;
+skybox_settings_open = false;
 
 //Scene Creation 
 splash_offset = new vec2(0, 0);

@@ -29,13 +29,13 @@ camera_set_proj_mat(cam, mat_projection);
 
 //Apply Camera
 camera_apply(cam);
-
-//Clear Surface for new frame
-draw_clear_alpha(0, 1);
-draw_clear(0)
+draw_clear_alpha(0, 0);
 
 #endregion
 #region Draw Pass
+
+//Skybox
+with (skybox) {event_perform(ev_draw, 0);}
 
 //Grid
 var gd = grid.depth_mode;

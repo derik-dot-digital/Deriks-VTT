@@ -63,32 +63,32 @@ function cm_create_sphere_vbuff(hVerts, vVerts, hRep, vRep, color)
 			var yc2 = cos(ya2);
 			var ys2 = sin(ya2);
 			
-			vertex_position_3d(vbuff, 0, 0, 0);
+			vertex_position_3d(vbuff, xc1 * ys1, xs1 * ys1, yc1);
 			vertex_normal(vbuff, xc1 * ys1, xs1 * ys1, yc1);
 			vertex_texcoord(vbuff, xx / hVerts * hRep, yy / vVerts * vRep);
 			vertex_color(vbuff, color, 1);
 			
-			vertex_position_3d(vbuff, 0, 0, 0);
+			vertex_position_3d(vbuff, xc1 * ys2, xs1 * ys2, yc2);
 			vertex_normal(vbuff, xc1 * ys2, xs1 * ys2, yc2);
 			vertex_texcoord(vbuff, xx / hVerts * hRep, (yy+1) / vVerts * vRep);
 			vertex_color(vbuff, color, 1);
 			
-			vertex_position_3d(vbuff, 0, 0, 0);
+			vertex_position_3d(vbuff, xc2 * ys1, xs2 * ys1, yc1);
 			vertex_normal(vbuff, xc2 * ys1, xs2 * ys1, yc1);
 			vertex_texcoord(vbuff, (xx+1) / hVerts * hRep, yy / vVerts * vRep);
 			vertex_color(vbuff, color, 1);
 			
-			vertex_position_3d(vbuff, 0, 0, 0);
+			vertex_position_3d(vbuff, xc1 * ys2, xs1 * ys2, yc2);
 			vertex_normal(vbuff, xc1 * ys2, xs1 * ys2, yc2);
 			vertex_texcoord(vbuff, xx / hVerts * hRep, (yy+1) / vVerts * vRep);
 			vertex_color(vbuff, color, 1);
 			
-			vertex_position_3d(vbuff, 0, 0, 0);
+			vertex_position_3d(vbuff, xc2 * ys2, xs2 * ys2, yc2);
 			vertex_normal(vbuff, xc2 * ys2, xs2 * ys2, yc2);
 			vertex_texcoord(vbuff, (xx+1) / hVerts * hRep, (yy+1) / vVerts * vRep);
 			vertex_color(vbuff, color, 1);
 			
-			vertex_position_3d(vbuff, 0, 0, 0);
+			vertex_position_3d(vbuff, xc2 * ys1, xs2 * ys1, yc1);
 			vertex_normal(vbuff, xc2 * ys1, xs2 * ys1, yc1);
 			vertex_texcoord(vbuff, (xx+1) / hVerts * hRep, yy / vVerts * vRep);
 			vertex_color(vbuff, color, 1);

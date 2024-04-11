@@ -1,5 +1,8 @@
 #region Draw Grid
 
+//Check if Enabled
+if enabled {
+
 //Grid Matrix
 var grid_mat = matrix_build(grid_pos.x, grid_pos.y, grid_pos.z, 0, 0, 0, 1, 1, 1);
 
@@ -34,5 +37,7 @@ shader_reset();
 
 //Reset Matrix
 matrix_set(matrix_world, matrix_build_identity());
+
+}
 
 #endregion

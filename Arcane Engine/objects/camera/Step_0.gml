@@ -431,6 +431,9 @@ if (ImGui.BeginMenu("Windows")) {
 	if (ImGui.MenuItem("Assets")) {
 		if !asset_settings_open {asset_settings_open = true;}
 	}
+	if (ImGui.MenuItem("Skybox")) {
+		if !skybox_settings_open {skybox_settings_open = true;}	
+	}
 	ImGui.EndMenu();
 }
 
@@ -507,6 +510,9 @@ if grid_settings_open {
 	//Close Window
 	var ret = ImGui.Begin("Grid", grid_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
 	grid_settings_open = ret & ImGuiReturnMask.Pointer;
+
+	//Enable/Disable
+	grid.enabled = ImGui.Checkbox("Enable/Disable", grid.enabled);
 
 	//Tile size
 	var prev_grid_size = grid.grid_size;
@@ -654,7 +660,50 @@ if grid_settings_open {
 	
  }
  
-//Right Click Context Menu
+ //Skybox Panel
+if skybox_settings_open {	
+
+	//Close Window
+	var ret = ImGui.Begin("Skybox", skybox_settings_open, ImGuiWindowFlags.AlwaysAutoResize, ImGuiReturnMask.Both);
+	skybox_settings_open = ret & ImGuiReturnMask.Pointer;
+	
+	//Enable/Disable
+	skybox.enabled = ImGui.Checkbox("Enable/Disable", skybox.enabled);
+	
+	//Grid Depth Mode
+	skybox_mode_str_array = ["Solid Color", "Solid Rainbow", "Rainbow Wave", "Dynamic", "Cubemap", "HDRI"];
+	var skybox_mode_open = ImGui.BeginCombo("Mode", skybox_mode_str_array[skybox.mode], ImGuiComboFlags.None);
+	if skybox_mode_open {
+		for (var i = 0; i < array_length(skybox_mode_str_array); i++) {
+			var item = ImGui.Selectable(skybox_mode_str_array[i],,ImGuiSelectableFlags.None);
+			if item = true {skybox.mode = i;}
+		}
+	ImGui.EndCombo();
+	}
+	
+	//Solid Color
+	switch (skybox.mode) 
+	{
+	
+		//Solid Color
+		case (skybox_modes.solid_color):
+		ImGui.Text("Skybox Color:");
+		skybox.color = ImGui.ColorPicker3("Skybox Color", skybox.color);
+		break;
+
+		//Solid Rainbow
+		case (skybox_modes.solid_rainbow):
+		skybox.rainbow_spd = ImGui.InputFloat("Rainbow Speed", skybox.rainbow_spd, 0.01, 0.1);
+		break;
+
+	}
+	
+	//End Menu
+	ImGui.End();
+
+}
+ 
+ //Right Click Context Menu
 if mouse_check_button_released(mb_right) {
 	right_click_open = true;
 	ImGui.SetNextWindowPos(window_mouse_get_x(), window_mouse_get_y());
