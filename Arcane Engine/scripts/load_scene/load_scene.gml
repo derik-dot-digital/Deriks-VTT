@@ -61,16 +61,29 @@ function load_scene(specific_directory = undefined, import_mode = false){
 			
 			//Grid Data
 			with (grid) {
-			grid.grid_size = ini_read_real("Grid Settings", "grid_size", grid.grid_size);
-			grid.tile_size = ini_read_real("Grid Settings", "tile_size", grid.tile_size);
-			grid.depth_mode = ini_read_string("Grid Settings", "depth_mode", grid.depth_mode);
-			grid.color_mode = ini_read_real("Grid Settings", "color_mode", grid.color_mode);
-			grid.grid_color.x = ini_read_real("Grid Settings", "grid_color_red", grid.grid_color.x);
-			grid.grid_color.y = ini_read_real("Grid Settings", "grid_color_green", grid.grid_color.y);
-			grid.grid_color.z = ini_read_real("Grid Settings", "grid_color_blue", grid.grid_color.z);
-			grid.grid_color.w = ini_read_real("Grid Settings", "grid_color_alpha", grid.grid_color.w);
-			grid.rainbow_color_scale = ini_read_real("Grid Settings", "rainbow_color_scale", grid.rainbow_color_scale);
-			grid.rainbow_color_spd = ini_read_real("Grid Settings", "rainbow_color_spd", grid.rainbow_color_spd);
+				event_perform(ev_create, 0);
+				enabled = ini_read_real("Grid Settings", "enabled", enabled);
+				grid_size = ini_read_real("Grid Settings", "grid_size", grid_size);
+				tile_size = ini_read_real("Grid Settings", "tile_size", tile_size);
+				depth_mode = ini_read_string("Grid Settings", "depth_mode", depth_mode);
+				color_mode = ini_read_real("Grid Settings", "color_mode", color_mode);
+				grid_color.x = ini_read_real("Grid Settings", "grid_color_red", grid_color.x);
+				grid_color.y = ini_read_real("Grid Settings", "grid_color_green", grid_color.y);
+				grid_color.z = ini_read_real("Grid Settings", "grid_color_blue", grid_color.z);
+				grid_color.w = ini_read_real("Grid Settings", "grid_color_alpha", grid_color.w);
+				rainbow_color_scale = ini_read_real("Grid Settings", "rainbow_color_scale", rainbow_color_scale);
+				rainbow_color_spd = ini_read_real("Grid Settings", "rainbow_color_spd", rainbow_color_spd);
+				update_grid();
+			}
+				
+			//Skybox Data
+			with (skybox) {
+				enabled = ini_read_real("Skybox Settings", "enabled", enabled);
+				mode = ini_read_real("Skybox Settings", "mode", mode);
+				color = make_color_rgb(	ini_read_real("Skybox Settings", "color_r", color_get_red(color)),
+																ini_read_real("Skybox Settings", "color_g", color_get_green(color)),
+																ini_read_real("Skybox Settings", "color_b", color_get_blue(color)));
+				rainbow_spd = ini_read_real("Skybox Settings", "rainbow_spd", rainbow_spd);
 			}
 			
 			//Close .INI
@@ -123,7 +136,10 @@ function load_scene(specific_directory = undefined, import_mode = false){
 			asset_inst.orientation.y = ini_read_real("Orientation", "y", 0);
 			asset_inst.orientation.z = ini_read_real("Orientation", "z", 0);
 			asset_inst.orientation.w = ini_read_real("Orientation", "w", 1);
-		
+			asset_inst.art_w = ini_read_real("Resolution", "width", asset_inst.art_w);
+			asset_inst.art_h = ini_read_real("Resolution", "height", asset_inst.art_h);
+			asset_inst.loaded_from_save = true;
+			
 			//Close .INI
 			ini_close();
 				

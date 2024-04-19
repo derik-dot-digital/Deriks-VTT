@@ -4,7 +4,7 @@
 gpu_set_ztestenable(true);
 gpu_set_zwriteenable(true);
 gpu_set_alphatestenable(true);
-gpu_set_alphatestref(0)
+gpu_set_alphatestref(0);
 gpu_set_blendenable(true);
 
 //Create Camera Struct
@@ -138,6 +138,9 @@ font_dnd = ImGui.AddFontFromFile("fonts/Bookinsanity Bold.ttf", 24);
 //Mouse
 mouse_pos = new vec2(mouse_x, mouse_y);
 mouse_pos_prev = mouse_pos;
+
+//Tab Counter
+tab_counter = 0;
 
 //Asset Transform Axis Lock
 asset_axis_lock = new vec3(1, 1, 1);

@@ -5,6 +5,9 @@ instance_create_depth(0, 0, 0, camera);
 instance_create_depth(0, 0, 0, grid);
 instance_create_depth(0, 0, 0, skybox);
 
+//Enable Drag n' Drop
+file_dropper_init();
+
 #endregion
 #region Assets
 

@@ -10,6 +10,7 @@ model = undefined;
 art = undefined;
 art_w = grid.tile_size;
 art_h = grid.tile_size;
+loaded_from_save = false;
 
 //Stores the nasme of the Asset as a String
 name = "undefined";

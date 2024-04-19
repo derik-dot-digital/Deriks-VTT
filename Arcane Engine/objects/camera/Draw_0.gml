@@ -23,19 +23,23 @@ if surface_get_width(application_surface) != ww or surface_get_height(applicatio
 mat_proj_perspective = matrix_build_projection_perspective_fov(-fov, aspect, znear_perspective, zfar);
 mat_proj_orthographic = matrix_build_projection_ortho((-ww * 0.001) * zoom,  (-wh * 0.001) * zoom, znear_ortho, zfar);
 	
-//Apply Matrices to Camera
+//Set View Matrix
 camera_set_view_mat(cam, mat_view);
-camera_set_proj_mat(cam, mat_projection);
 
-//Apply Camera
-camera_apply(cam);
-draw_clear_alpha(0, 0);
+//Clear Frame
+draw_clear_alpha(0,0);
 
 #endregion
 #region Draw Pass
 
-//Skybox
+//Skybox (Has to be rendered with Perspective Camera)
+camera_set_proj_mat(cam, mat_proj_perspective);
+camera_apply(cam);
 with (skybox) {event_perform(ev_draw, 0);}
+
+//Apply Scene Camera
+camera_set_proj_mat(cam, mat_projection);
+camera_apply(cam);
 
 //Grid
 var gd = grid.depth_mode;
@@ -52,17 +56,32 @@ if gd = "Always Behind" {
 }
 
 //Assets
-with(asset) {event_perform(ev_draw, 0);}
+with(asset) {
+	event_perform(ev_draw, 0);
+}
+with (asset) {
+	shader_set(shd_asset_shadows);
+	event_user(1);
+	shader_reset();	
+}
 
 //Grid
 if gd = "Always Above" {
 	gpu_set_ztestenable(false);
-	gpu_set_zwriteenable(false);	
+	gpu_set_zwriteenable(false);
 	with(grid) {
 		event_perform(ev_draw, 0);
 	}
 	gpu_set_zwriteenable(true);	
 	gpu_set_ztestenable(true);
 }
+
+if gd = "Overlay" {
+	//DOESNT DO ANYTHING FOR NOW
+	with(grid) {
+		event_perform(ev_draw, 0);
+	}
+}
+
 
 #endregion

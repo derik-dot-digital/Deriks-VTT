@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"shd_skybox_hdri",
+  "name":"shd_skybox_hdri",
+  "parent":{
+    "name":"Shaders",
+    "path":"folders/Shaders.yy",
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1,
+}

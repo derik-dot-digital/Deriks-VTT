@@ -23,6 +23,23 @@ var plusminus = -keyboard_check(vk_add)+keyboard_check(vk_subtract);
 //Shift Input
 var shift = keyboard_check(vk_shift);
 
+//Clear Inputs
+if ImGui.IsAnyItemFocused() {
+	shift = 0;
+	plusminus = 0;
+	numpad = array_create(10, 0);
+	//mouse_scroll = 0;
+} else {
+	
+	//Tab through assets
+	if keyboard_check_released(vk_tab) {
+		var asset_count = instance_number(asset) - 1;
+		tab_counter++;
+		if tab_counter > asset_count {tab_counter = 0;}
+		global.selected_inst = instance_find(asset, tab_counter);
+	}
+}
+
 //Screen to World Cast
 if !ImGui.IsAnyItemHovered() and !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) {
 	
@@ -45,7 +62,7 @@ if !ImGui.IsAnyItemHovered() and !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWin
 }
 	
 //Asset Action Detect
-if global.selected_inst != noone {
+if global.selected_inst != noone and !ImGui.IsAnyItemFocused() {
 	
 	//Axis Lock
 	if keyboard_check_released(ord("X")) {
@@ -96,6 +113,13 @@ if global.selected_inst != noone {
 		target = global.selected_inst.pos;	
 	}
 	
+	//Delete
+	if keyboard_check_released(ord("X")) and keyboard_check(vk_control) {
+	instance_destroy(global.selected_inst);
+	global.selected_inst = noone;
+	global.selection_action = asset_actions.idle;
+	}
+	
 	//Finish Action
 	if keyboard_check_released(vk_enter) or mouse_check_button(mb_left) {
 	global.selection_action = asset_actions.idle;
@@ -104,7 +128,7 @@ if global.selected_inst != noone {
 } 
 	
 //Asset Actions Apply
-if global.selected_inst != noone {
+if global.selected_inst != noone  {
 	switch(global.selection_action) {
 	
 	//Idle
@@ -117,10 +141,11 @@ if global.selected_inst != noone {
 
 	//Move
 	case (asset_actions.move):
-	
-	var move_vec = mouse_delta.AsVec3(0).RotatebyQuat(view_quat).Mul(-zoom*0.002).Mul(asset_axis_lock); //move_vec.z = 0;
+	var move_vec = mouse_delta.AsVec3(0).RotatebyQuat(view_quat).Mul(-zoom*0.002).Mul(asset_axis_lock); 
 	global.selected_inst.pos = global.selected_inst.pos.Add(move_vec);
-	
+	if keyboard_check(vk_shift) {
+	global.selected_inst.pos = global.selected_inst.pos.Snapped(new vec3(grid.tile_size, grid.tile_size, grid.tile_size).Mul(0.5));
+	}
 	break;
 
 	//Rotate
@@ -144,6 +169,13 @@ if global.selected_inst != noone {
 	break;
 
 	
+	}
+}
+
+//Save Shortcut
+if zip_save_status = undefined {
+	if keyboard_check(vk_control) and keyboard_check_released(ord("S")) and dm.scene_zip != undefined {
+		save_scene();
 	}
 }
 
@@ -203,6 +235,65 @@ if numpad[5] {
 	projection_slider = 0;	
 	}
 }
+	
+//Align Camera to World -Z Shortcut
+if numpad[7] {
+	dir = world_down.Normalize();
+	view_quat =  view_quat.FromLookRotation(world_up, world_x).Normalize();
+	right = world_x.Normalize();
+	up = dir.Cross(right).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+	projection_slider = 1;
+}
+//Align Camera to World X Shortcut
+if numpad[3] {
+	dir = world_x.Negate().Normalize();
+	view_quat =  view_quat.FromLookRotation(world_x.Negate(), world_up).Normalize();
+	right = world_y.Normalize();
+	up = dir.Cross(right).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+	projection_slider = 1;
+}
+//Align Camera to World -Y Shortcut
+if numpad[1] {
+	dir = world_y.Normalize();
+	view_quat =  view_quat.FromLookRotation(world_y, world_up).Normalize();
+	right = world_x.Normalize();
+	up = dir.Cross(right).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+	projection_slider = 1;
+}
+//Align Camera to World -X Shortcut
+if numpad[9] {
+	dir = world_x.Normalize();
+	view_quat =  view_quat.FromLookRotation(world_x, world_up).Normalize();
+	right = world_y.Normalize();
+	up = dir.Cross(right).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+	projection_slider = 1;
+}
+
+//Rotate Camera around View Up
+var numpad_uprot = numpad[6] - numpad[4];
+if numpad_uprot != 0 {
+	var xrot_quat = new quat().FromAngleAxis(numpad_uprot * degtorad(90/3), world_up).Normalize();
+	view_quat = xrot_quat.Mul(view_quat).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+}
+
+//Rotate Camera around View Right
+var numpad_rightrot = numpad[8] - numpad[2];
+if numpad_rightrot != 0 {
+	var yrot_quat = new quat().FromAngleAxis(numpad_rightrot * degtorad(90/3), world_x).Normalize();
+	view_quat = view_quat.Mul(yrot_quat).Normalize();
+	dir = world_up.RotatebyQuat(view_quat).Normalize();
+	right = world_x.RotatebyQuat(view_quat).Normalize();
+}
 
 //NumPad Zoom
 zoom *= power(zoom, plusminus *zoom_strength);
@@ -210,13 +301,12 @@ zoom *= power(zoom, plusminus *zoom_strength);
 //Update Mouse Previous Position
 mouse_pos_prev = mouse_pos;
 
-} else { //Splash Window
-	
+} 
+else if splash_window { //Splash Window
 	var xrot_quat = new quat().FromAngleAxis(-0.003, world_up).Normalize();
 	view_quat = xrot_quat.Mul(view_quat).Normalize();
 	dir = world_up.RotatebyQuat(view_quat).Normalize();
 	right = world_x.RotatebyQuat(view_quat).Normalize();
-	
 }
 
 //Update Position
@@ -525,7 +615,7 @@ if grid_settings_open {
 	if grid.tile_size != prev_tile_size {regenerate_buffer = 1;}
 
 	//Grid Depth Mode
-	var grid_depth_mode_str = ["Default", "Always Behind", "Always Above"];
+	var grid_depth_mode_str = ["Default", "Always Behind", "Always Above", "Overlay"];
 	var grid_depth_mode_open = ImGui.BeginCombo("Depth Mode", grid.depth_mode, ImGuiComboFlags.None);
 	if grid_depth_mode_open {
 		for (var i = 0; i < array_length(grid_depth_mode_str); i++) {
@@ -602,48 +692,61 @@ if grid_settings_open {
 		ImGui.Text("Select an asset to view.");	
 	} else { //Asset Selected
 		
-		//Grab Instance Reference	
-		var inst = global.selected_inst;
+	//Grab Instance Reference	
+	var inst = global.selected_inst;
 		
-		//Name (Avoids Duplicates)
-		var new_name = ImGui.InputText("Name", inst.name);
-		var name_taken = false;
-		for (var i = 0; i < instance_number(asset); i++) {
-			var _inst = instance_find(asset, i);
-			if _inst != global.selected_inst {
-				if new_name = _inst.name{
-				name_taken = true;	
-				}
+	//Name (Avoids Duplicates)
+	var new_name = ImGui.InputText("Name", inst.name);
+	var name_taken = false;
+	for (var i = 0; i < instance_number(asset); i++) {
+		var _inst = instance_find(asset, i);
+		if _inst != global.selected_inst {
+			if new_name = _inst.name{
+			name_taken = true;	
 			}
 		}
-		if !name_taken {inst.name = new_name}else{ImGui.TextColored("**Duplicate name, will not be applied.", c_red, 1);}
+	}
+	if !name_taken {inst.name = new_name}else{ImGui.TextColored("**Duplicate name, will not be applied.", c_red, 1);}
 		
-		//Asset Type
-		var asset_type_str = ["Empty", "Map", "Art", "Player", "NPC"]
-		var asset_type_open = ImGui.BeginCombo("Asset Type", asset_type_str[inst.type], ImGuiComboFlags.None);
-		if asset_type_open {
-			for (var i = 0; i < array_length(asset_type_str); i++) {
-				var item = ImGui.Selectable(asset_type_str[i],,ImGuiSelectableFlags.None);
-				if item = true {
-					inst.type = i; 
-				}
+	//Asset Type
+	var asset_type_str = ["Empty", "Map", "Art", "Player", "NPC"]
+	var asset_type_open = ImGui.BeginCombo("Asset Type", asset_type_str[inst.type], ImGuiComboFlags.None);
+	if asset_type_open {
+		for (var i = 0; i < array_length(asset_type_str); i++) {
+			var item = ImGui.Selectable(asset_type_str[i],,ImGuiSelectableFlags.None);
+			if item = true {
+				inst.type = i; 
 			}
-		ImGui.EndCombo();
 		}
-		
-		var transform_tree_open = ImGui.TreeNodeEx("Transform", ImGuiTreeNodeFlags.NoTreePushOnOpen);
-		if transform_tree_open {
+	ImGui.EndCombo();
+	}
+	
+	//Image Settings
+	if sprite_exists(inst.art) {
+		var image_tree_open = ImGui.TreeNodeEx("Image", ImGuiTreeNodeFlags.CollapsingHeader);
+		if image_tree_open {
 			
+		//Resolution
+		var resolution_array = [inst.art_w, inst.art_h];
+		ImGui.InputFloat2("Resolution", resolution_array, 0.1, 1);
+		inst.art_w = resolution_array[0]; inst.art_h = resolution_array[1];
+
+		}	
+	}
+
+	//Transform
+	var transform_tree_open = ImGui.TreeNodeEx("Transform", ImGuiTreeNodeFlags.CollapsingHeader);
+	if transform_tree_open {
+		
 		//Position
 		var pos_array = inst.pos.AsLinearArray();
 		ImGui.InputFloat3("Position", pos_array);
 		inst.pos.x = pos_array[0]; inst.pos.y = pos_array[1]; inst.pos.z = pos_array[2];
 	
-		//Orientation Quat
-		var orientation_quat_array = [[inst.orientation.x, inst.orientation.y], [inst.orientation.z, inst.orientation.w]];
-		ImGui.InputFloat2("Orientation Quaternion X/Y", orientation_quat_array[0],,,,ImGuiInputTextFlags.None);
-		ImGui.InputFloat2("Orientation Quaternion Z/W", orientation_quat_array[1],,,,ImGuiInputTextFlags.None);
-		inst.orientation = new quat(orientation_quat_array[0][0], orientation_quat_array[0][1], orientation_quat_array[1][0], orientation_quat_array[1][1]);
+		//Orientation/Rotation
+		var orientation_as_euler_array = inst.orientation.ToEulerAngles().AsLinearArray();
+		ImGui.InputFloat3("Rotation", orientation_as_euler_array,,,,ImGuiInputTextFlags.None);
+		inst.orientation = new quat().FromEulerAngles(new vec3(orientation_as_euler_array[0], orientation_as_euler_array[1], orientation_as_euler_array[2])).Normalize();
 	
 		//Scale
 		var scale_array = inst.scale.AsLinearArray();
@@ -651,10 +754,11 @@ if grid_settings_open {
 		inst.scale.x = scale_array[0]; inst.scale.y = scale_array[1]; inst.scale.z = scale_array[2];
 		
 		}
-
-		ImGui.TreePop();
-		
+	ImGui.TreePop();
+	
 	}
+	
+	
 	//End Menu
 	ImGui.End();
 	
@@ -695,6 +799,14 @@ if skybox_settings_open {
 		}
 	}
 	
+	//HDRI Mode
+	if skybox.mode = skybox_modes.hdri {
+	
+	//HDRI Selection
+	skybox.hdri_index = ImGui.InputInt("Style", skybox.hdri_index, 1, 1);
+		
+	}
+	
 	
 	//Solid Color
 	switch (skybox.mode) 
@@ -725,7 +837,7 @@ if mouse_check_button_released(mb_right) {
 }
 if right_click_open {
 	if (ImGui.Begin("right_click", right_click_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove)) {
-	
+
 		//Roll Die
 		if (ImGui.MenuItem("Roll Die")){
 			//Add functionality for rolling a 3D die with options for all die + physics

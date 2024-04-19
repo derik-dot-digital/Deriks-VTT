@@ -53,8 +53,19 @@ function mouse_to_world_cast() {
 	var _mx = (window_mouse_get_x() / ww);
 	var _my = 1-(window_mouse_get_y() / wh);
 	var _2dto3d = cm_2d_to_3d(_v, _p, _mx, _my);
-	var _ray_dist = camera.zoom * 2;
+	var _ray_dist = 100000;
 	var _ray = cm_ray(_2dto3d[3],  _2dto3d[4],  _2dto3d[5], _2dto3d[3] + _2dto3d[0] * _ray_dist, _2dto3d[4] + _2dto3d[1] * _ray_dist, _2dto3d[5] + _2dto3d[2] * _ray_dist);
 	var _cast = cm_cast_ray(global.collision, _ray);
 	return [_cast[CM_RAY.HIT], _cast[CM_RAY.X], _cast[CM_RAY.Y], _cast[CM_RAY.Z], _cast[CM_RAY.NX], _cast[CM_RAY.NY], _cast[CM_RAY.NZ], _cast[CM_RAY.OBJECT]];
+}
+
+
+function cm_ray_get_nx(ray) {
+	return ray[CM_RAY.NX];
+}
+function cm_ray_get_ny(ray) {
+	return ray[CM_RAY.NY];
+}
+function cm_ray_get_nz(ray) {
+	return  ray[CM_RAY.NZ];
 }

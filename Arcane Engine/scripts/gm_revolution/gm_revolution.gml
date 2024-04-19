@@ -835,14 +835,15 @@ function quat(x = 0, y = 0, z = 0, w = 1) constructor {
 	static ToAngleAxis = function() {
 		gml_pragma("forceinline");			
 		var angles = new vec3(0, 0, 0);
-	    var sinr_cosp = 2 * (self.w * self.x + self.y * self.z);
-	    var cosr_cosp = 1 - 2 * (self.x * self.x + self.y * self.y);
+		var q = self;//new quat(abs(self.x), abs(self.y), abs(self.z), abs(self.w));
+	    var sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+	    var cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
 	    angles.x = arctan2(sinr_cosp, cosr_cosp);
-	    var sinp = sqrt(1 + 2 * (self.w * self.y - self.x * self.z));
-	    var cosp = sqrt(1 - 2 * (self.w * self.y - self.x * self.z));
+	    var sinp = sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
+	    var cosp = sqrt(abs(1 - 2 * (q.w * q.y - q.x * q.z)));
 	    angles.y = 2 * arctan2(sinp, cosp) - pi / 2;
-	    var siny_cosp = 2 * (self.w * self.z + self.x * self.y);
-	    var cosy_cosp = 1 - 2 * (self.y * self.y + self.z * self.z);
+	    var siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+	    var cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
 	    angles.z= arctan2(siny_cosp, cosy_cosp);
 		return angles;
 	}

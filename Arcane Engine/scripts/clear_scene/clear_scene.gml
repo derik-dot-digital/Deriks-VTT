@@ -14,7 +14,14 @@ function clear_scene(){
 			//Clear Asset List
 			ds_list_clear(dm.asset_list)
 			
+			//Clear .ZIP reference
+			dm.scene_zip = undefined;
+			
 			//Clear Any Pre-Existing Assets from Scene
 			with (asset) {instance_destroy();}
+			
+			//Reset Grid & Skybox
+			instance_destroy(grid); instance_create_depth(0, 0, 0, grid);
+			instance_destroy(skybox); instance_create_depth(0, 0, 0, skybox);
 			
 }

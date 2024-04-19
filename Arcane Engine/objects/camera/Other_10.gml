@@ -29,6 +29,7 @@ ini_write_real("Projection Settings", "zoom", zoom);
 ini_write_real("Projection Settings", "zoom_strength", zoom_strength);
 
 //Grid Data
+ini_write_real("Grid Settings", "enabled", grid.enabled);
 ini_write_real("Grid Settings", "grid_size", grid.grid_size);
 ini_write_real("Grid Settings", "tile_size", grid.tile_size);
 ini_write_string("Grid Settings", "depth_mode", grid.depth_mode);
@@ -39,6 +40,14 @@ ini_write_real("Grid Settings", "grid_color_blue", grid.grid_color.z);
 ini_write_real("Grid Settings", "grid_color_alpha", grid.grid_color.w);
 ini_write_real("Grid Settings", "rainbow_color_scale", grid.rainbow_color_scale);
 ini_write_real("Grid Settings", "rainbow_color_spd", grid.rainbow_color_spd);
+
+//Skybox
+ini_write_real("Skybox Settings", "enabled", skybox.enabled);
+ini_write_real("Skybox Settings", "mode", skybox.mode);
+ini_write_real("Skybox Settings", "color_r", color_get_red(skybox.color));
+ini_write_real("Skybox Settings", "color_g", color_get_green(skybox.color));
+ini_write_real("Skybox Settings", "color_b", color_get_blue(skybox.color));
+ini_write_real("Skybox Settings", "rainbow_spd", skybox.rainbow_spd);
 
 //End Config Data
 ini_close();

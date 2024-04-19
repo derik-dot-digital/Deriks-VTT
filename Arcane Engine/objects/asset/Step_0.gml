@@ -40,15 +40,6 @@ if file_loaded {
 	}
 }
 
-//Update Image Size
-if sprite_exists(art) {
-
-		//Store Sprite Size
-		art_w = sprite_get_width(art);
-		art_h = sprite_get_height(art);
-		
-}
-
 //Check Selection Status
 if global.selected_inst = id {selected = true;}else{selected = false;}
 

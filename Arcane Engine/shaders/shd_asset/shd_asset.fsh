@@ -1,11 +1,10 @@
-//
-// Simple passthrough fragment shader
-//
+precision highp float;
 varying vec2 v_vTexcoord;
 varying vec4 v_vColour;
 varying vec3 v_vNormal;
 varying float selected;
-varying vec2 outline_size;
+varying float is_character;
+
 void main()
 {
 	vec2 uvs = vec2(1.0-v_vTexcoord.x, v_vTexcoord.y);
@@ -16,7 +15,26 @@ void main()
     float spriteAlphaT = texture2D(gm_BaseTexture, uvs + vec2(0.0, outline_size.y)).a;
     float spriteAlphaR = texture2D(gm_BaseTexture, uvs - vec2(outline_size.x, 0.0)).a;
     float spriteAlphaB = texture2D(gm_BaseTexture, uvs - vec2(0.0, outline_size.y)).a;
-	
+		if (is_character == 1.0) {
+			float outline_size_average = (outline_size.x + outline_size.y) * 10.0;
+			float dist_from_center = distance(v_vTexcoord, vec2(0.5, 0.5));
+			float character_rad = 0.5 - outline_size_average;
+			spriteSample.rgb = mix(spriteSample.rgb, vec3(0.0, 0.0, 0.0), pow(dist_from_center+0.5, 10.0));
+			if (dist_from_center > character_rad) {
+				spriteSample.a = 0.0;
+				if (dist_from_center < (character_rad + outline_size_average)) {
+					spriteAlphaL = 1.0;
+				} 
+				else
+				{
+					spriteAlphaL = 0.0;
+					spriteAlphaT = 0.0;
+					spriteAlphaR = 0.0;
+					spriteAlphaB = 0.0;
+				}
+			}
+		}
+		
 	//Selected 
 	if (selected == 1.0) {
 		
@@ -37,13 +55,15 @@ void main()
 	    }
 	
 		//Edge Outline
-		if ((v_vTexcoord.x < outline_size)
-		|| (v_vTexcoord.x > 1.0 - outline_size)
-		|| (v_vTexcoord.y < outline_size) 
-		|| (v_vTexcoord.y > 1.0 - outline_size))
-		{
-			gl_FragColor = outline_color;
-			outline_applied = 1.0;
+		if (is_character == 0.0) {
+			if ((v_vTexcoord.x < outline_size) 
+			|| (v_vTexcoord.x > 1.0 - outline_size)
+			|| (v_vTexcoord.y < outline_size) 
+			|| (v_vTexcoord.y > 1.0 - outline_size))
+			{
+				gl_FragColor = outline_color;
+				outline_applied = 1.0;
+			}
 		}
 		
 		if (outline_applied == 0.0) {
