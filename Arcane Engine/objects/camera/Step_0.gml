@@ -23,8 +23,15 @@ var plusminus = -keyboard_check(vk_add)+keyboard_check(vk_subtract);
 //Shift Input
 var shift = keyboard_check(vk_shift);
 
+//Arrow Keys Input
+var up_key = keyboard_check_pressed(vk_up);
+var down_key = -keyboard_check_pressed(vk_down);
+var left_key = keyboard_check_pressed(vk_left);
+var right_key = -keyboard_check_pressed(vk_right);
+var arrow_keys_vec = new vec2(left_key+right_key, up_key+down_key);
+
 //Clear Inputs
-if ImGui.IsAnyItemFocused() {
+if ImGui.IsAnyItemFocused() or ImGui.IsAnyItemActive() {
 	shift = 0;
 	plusminus = 0;
 	numpad = array_create(10, 0);
@@ -137,6 +144,13 @@ if global.selected_inst != noone  {
 	asset_quat_prev = global.selected_inst.orientation;
 	asset_scale_prev = global.selected_inst.scale;
 	asset_axis_lock = asset_axis_unlocked;
+	
+	//Basic Grid Movement with Arrow-Keys
+	if arrow_keys_vec.Magnitude() !=  0 {
+	global.selected_inst.pos = global.selected_inst.pos.Add(arrow_keys_vec.AsVec3(0).RotatebyQuat(view_quat).Mul(grid.tile_size*0.5));
+	global.selected_inst.pos = global.selected_inst.pos.Snapped(new vec3(grid.tile_size, grid.tile_size, grid.tile_size).Mul(0.5));
+	}
+	
 	break;
 
 	//Move
