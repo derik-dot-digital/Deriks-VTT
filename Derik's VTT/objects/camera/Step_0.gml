@@ -347,7 +347,7 @@ if splash_window {
 	logo_size = logo_size.Mul(logo_scale);
 	var splash_pos = new vec2(win_w  / 2, win_h / 2).Sub(splash_offset);
 	ImGui.SetNextWindowPos(splash_pos.x, splash_pos.y, ImGuiCond.Always);
-	ImGui.Begin("Arcane Engine v0.1", splash_window, ImGuiWindowFlags.Modal | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove);
+	ImGui.Begin("Derik's VTT v0.1", splash_window, ImGuiWindowFlags.Modal | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove);
 
 	//Logo
 	ImGui.Image(logo, 0, c_white, 1, logo_size.x, logo_size.y);

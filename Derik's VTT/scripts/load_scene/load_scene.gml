@@ -2,7 +2,7 @@ function load_scene(specific_directory = undefined, import_mode = false){
 
 		//Select Scene .ZIP
 		if specific_directory = undefined {
-			dm.scene_directory = get_open_filename_ext("AE Scene File|*.zip;", "", default_scene_directory, "Select Arcane Engine Scene File");
+			dm.scene_directory = get_open_filename_ext("VTT File|*.zip;", "", default_scene_directory, "Select VTT File");
 		} else {
 			dm.scene_directory = specific_directory;
 		}

@@ -1,6 +1,6 @@
 {
   "$GMProject":"",
-  "%Name":"Arcane Engine",
+  "%Name":"Derik's VTT",
   "AudioGroups":[
     {"$GMAudioGroup":"","%Name":"audiogroup_default","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
@@ -114,7 +114,7 @@
   "MetaData":{
     "IDEVersion":"2024.2.0.132",
   },
-  "name":"Arcane Engine",
+  "name":"Derik's VTT",
   "resources":[
     {"id":{"name":"file_dropper","path":"extensions/file_dropper/file_dropper.yy",},},
     {"id":{"name":"FileMetadata","path":"extensions/FileMetadata/FileMetadata.yy",},},

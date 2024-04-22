@@ -79,7 +79,7 @@ cam_reset();
 #macro user_images directory_get_pictures_path()
 #macro working_dir directory_get_current_working()
 #macro asset_directory working_dir+"assets\\"
-#macro default_scene_directory user_documents+"Arcane Engine\\"
+#macro default_scene_directory user_documents+"Derik's VTT\\"
 if !directory_exists_ns(default_scene_directory) {directory_create_ns(default_scene_directory);}
 
 #endregion
