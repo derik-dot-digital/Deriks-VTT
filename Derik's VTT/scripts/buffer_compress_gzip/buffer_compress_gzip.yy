@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"buffer_compress_gzip",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"buffer_compress_gzip",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
