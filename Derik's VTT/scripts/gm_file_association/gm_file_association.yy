@@ -1,9 +1,9 @@
 {
   "$GMScript":"",
-  "%Name":"gm_custom_file_association",
+  "%Name":"gm_file_association",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"gm_custom_file_association",
+  "name":"gm_file_association",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

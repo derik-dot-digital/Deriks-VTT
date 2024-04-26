@@ -47,7 +47,7 @@ global.texcoords = [new vec2(0, 0), new vec2(0, 1), new vec2(1, 0), new vec2(1, 
 global.collision = cm_list();
 
 #endregion
-#region Scene Management'
+#region Scene Management
 
 //Store if scene has been saved
 scene_saved = false;
