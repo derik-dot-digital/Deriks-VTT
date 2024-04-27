@@ -264,7 +264,7 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 		_bat += nl + @"reg add HKCR\" + prog_id + @"\DefaultIcon /ve /d " + quote + "%ICON_PATH%" + quote + " /f"
 		_bat += nl + @"";
 		_bat += nl + @":: Set the command to open the file with your application";
-		_bat += nl + @"reg add HKCR\" + prog_id + @"\shell\open\command /ve /d " + quote + "\\" + quote + "%APP_PATH%" + "\\" + quote + " \\" + quote + "%1" + "\\" + quote + quote + " /f";
+		_bat += nl + @"reg add HKCR\" + prog_id + @"\shell\open\command /ve /d " + quote + @"\" + quote + @"%APP_PATH%" + @"\" + quote + @" \" + quote + @"%%1" + @"\" + quote + quote + " /f";
 		_bat += nl + @"";
 		_bat += nl + @":: Set content type and perceived type";
 		_bat += nl + @"reg add HKCR\" + prog_id + " /v " + quote + "Content Type" + quote + " /d " + quote + "application/vnd" + file_ext + quote + " /f";
