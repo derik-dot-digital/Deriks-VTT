@@ -1,9 +1,11 @@
-#region Draw 
+#region Image Assets
 
-//2D Assets
 if type = asset_types.art or type = asset_types.map or type  = asset_types.player or type = asset_types.npc {
 	
-	//Collision Setup
+	//Character?
+	var is_character = 0; if type = asset_types.player or type = asset_types.npc {is_character = 1;}
+	
+	//Generate Collision Plane
 	if col_shape = undefined or vbuff = undefined {
 		
 	//Generate 2D Plane
@@ -28,10 +30,7 @@ if type = asset_types.art or type = asset_types.map or type  = asset_types.playe
 	cm_add(global.collision, col_dynamic);
 		
 	}
-	
-	//Character?
-	var is_character = 0; if type = asset_types.player or type = asset_types.npc {is_character = 1;}
-	
+
 	//Render
 	if sprite_exists(art) {
 		
@@ -49,7 +48,12 @@ if type = asset_types.art or type = asset_types.map or type  = asset_types.playe
 	//Pass Uniforms to Shader
 	var uni_object_data = shader_get_uniform(shd_asset, "object_data");
 	shader_set_uniform_f_array(uni_object_data, object_data);
-	shader_set_uniform_f(shader_get_uniform(shd_asset, "resolution"), sprite_get_width(art), sprite_get_height(art));
+	////////////////////////////////////
+	var uni_is_character = shader_get_uniform(shd_asset, "frag_is_character");
+	shader_set_uniform_f(uni_is_character, is_character);
+	////////////////////////////////////
+	var uni_resolution = shader_get_uniform(shd_asset, "resolution");
+	shader_set_uniform_f(uni_resolution, sprite_get_width(art), sprite_get_height(art)); //True resolution, not user set resolution values
 	
 	//Update Collision Shape Matrix
 	cm_dynamic_set_matrix(col_dynamic, orientation.Conjugate().AsTransformMatrix(pos, default_scale), false, active_scale);
@@ -63,20 +67,26 @@ if type = asset_types.art or type = asset_types.map or type  = asset_types.playe
 	}		
 }
 
-//Draw Collision Shape
-if col_dynamic != undefined and draw_col_shape {
+#endregion
+#region Collision 
+
+//Debug Draw Collision Shape
+if (col_dynamic != undefined and draw_col_shape) or true {
 	
 	//Set ColMesh Debug Shader
 	shader_set(sh_cm_debug);
 	
-	//Draw Dynamic Collision Shape
+	//Draw Dynamic 
 	cm_debug_draw(col_dynamic);
 	
 	//Reset Shader
 	shader_reset();
 	
 }
-	
+
+#endregion
+#region Facing Direction
+
 //Draw Facing Direction
 if is_character and selected {
 	

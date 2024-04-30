@@ -3,8 +3,7 @@ varying vec2 v_vTexcoord;
 varying vec4 v_vColour;
 varying vec3 v_vNormal;
 varying float selected;
-varying float is_character;
-
+uniform float frag_is_character;
 void main()
 {
 	vec2 uvs = vec2(1.0-v_vTexcoord.x, v_vTexcoord.y);
@@ -15,7 +14,7 @@ void main()
     float spriteAlphaT = texture2D(gm_BaseTexture, uvs + vec2(0.0, outline_size.y)).a;
     float spriteAlphaR = texture2D(gm_BaseTexture, uvs - vec2(outline_size.x, 0.0)).a;
     float spriteAlphaB = texture2D(gm_BaseTexture, uvs - vec2(0.0, outline_size.y)).a;
-		if (is_character == 1.0) {
+		if (frag_is_character == 1.0) {
 			float outline_size_average = (outline_size.x + outline_size.y) * 10.0;
 			float dist_from_center = distance(v_vTexcoord, vec2(0.5, 0.5));
 			float character_rad = 0.5 - outline_size_average;
@@ -55,7 +54,7 @@ void main()
 	    }
 	
 		//Edge Outline
-		if (is_character == 0.0) {
+		if (frag_is_character == 0.0) {
 			if ((v_vTexcoord.x < outline_size) 
 			|| (v_vTexcoord.x > 1.0 - outline_size)
 			|| (v_vTexcoord.y < outline_size) 

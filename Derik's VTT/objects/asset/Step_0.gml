@@ -1,4 +1,4 @@
-#region Update
+#region Image Assets
 
 //Load Image into Working Directory
 if file_path != undefined and file_requested = false {
@@ -25,7 +25,11 @@ if file_path != undefined and file_requested = false {
 
 //Ensure Continuity of File Name with Asset Name
 if file_loaded {
+	
+	//Get Current File Name
 	var current_file_name = filename_name(file_path);
+	
+	//Rename if neccesary
 	if current_file_name != name+file_extension {
 
 		//New File Path with New FIle Name
@@ -39,6 +43,9 @@ if file_loaded {
 	
 	}
 }
+
+#endregion
+#region Update
 
 //Check Selection Status
 if global.selected_inst = id {selected = true;}else{selected = false;}

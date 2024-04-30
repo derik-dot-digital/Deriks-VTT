@@ -9,7 +9,6 @@ varying vec3 v_vNormal;
 varying float selected;
 varying vec2 outline_size;
 uniform float object_data[14];
-varying float is_character;
 
 vec3 rotate_quaternion(vec3 vec, vec4 q)
 {
@@ -24,7 +23,7 @@ vec3 transform_vertex(vec3 vec, vec3 pos, vec4 rot, vec3 scale)
 
 void main()
 {
-	 is_character = object_data[13];
+	float is_character = object_data[13];
 	vec3 object_pos = vec3(object_data[0], object_data[1], object_data[2]);
 	vec4 object_quat = vec4(object_data[3], object_data[4], object_data[5], object_data[6]);
 	vec3 object_scale = vec3(object_data[7], object_data[8], object_data[9]);
