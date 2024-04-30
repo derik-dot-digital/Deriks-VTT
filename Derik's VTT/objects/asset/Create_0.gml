@@ -45,4 +45,9 @@ scale = new vec3(1, 1, 1);
 //Selection Status
 selected = false;
 
+//Facing Direction
+facing_dir = 0;
+vbuff_look_dir_quat = new quat();
+vbuff_look_dir_scale = new vec3(1, 1, 1);
+
 #endregion 

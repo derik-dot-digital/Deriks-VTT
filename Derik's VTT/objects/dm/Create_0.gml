@@ -28,7 +28,9 @@ enum asset_actions {
 	idle,
 	move,
 	rotate,
-	scale
+	scale,
+	teleport,
+	walk
 }
 
 //Selected Inst ID
@@ -70,61 +72,66 @@ asset_list = ds_list_create();
 #endregion
 #region File Association
 
-//File Extension
-var dm_file_ext = ".dvtt";
-	
-//Check for File Association flag to determine wether or not to run the script
-var file_association_flag_path = program_directory + "file_association_flag" + dm_file_ext;
-var file_association_flag = file_exists_ns(file_association_flag_path);
-if !file_association_flag 
-{
-	
-	//Icon Path
-	var dvtt_icon_path = program_directory + "dvtt_icon.ico";
+//File Association
+file_assoc_enabled = false;
+if file_assoc_enabled {
 
-	//Program ID
-	var dvtt_prog_id = "DeriksVTT";
-
-	//File Type Description
-	var dvtt_file_type_desc = "Deriks VTT File";
-
-	//File Perceived Type
-	var dvtt_perceived_type = "document";
-
-	//Run File Association Script
-	gm_file_association(dm_file_ext, dvtt_icon_path, dvtt_prog_id, dvtt_file_type_desc, dvtt_perceived_type, true, false)
+	//File Extension
+	var dm_file_ext = ".dvtt";
 	
-}
-else
-{
+	//Check for File Association flag to determine wether or not to run the script
+	var file_association_flag_path = program_directory + "file_association_flag" + dm_file_ext;
+	var file_association_flag = file_exists_ns(file_association_flag_path);
+	if !file_association_flag 
+	{
 	
-	//Check if file association files exist and delete them as they are no longer needed
-	var game_path = program_directory;
-	var refresh_icons_path = game_path + "RefreshIcons.ps1";
-	var file_assoc_path = game_path + "file_assoc.bat";
-	if file_exists_ns(refresh_icons_path) {
-		file_delete_ns(refresh_icons_path);	
+		//Icon Path
+		var dvtt_icon_path = program_directory + "dvtt_icon.ico";
+
+		//Program ID
+		var dvtt_prog_id = "DeriksVTT";
+
+		//File Type Description
+		var dvtt_file_type_desc = "Deriks VTT File";
+
+		//File Perceived Type
+		var dvtt_perceived_type = "document";
+
+		//Run File Association Script
+		gm_file_association(dm_file_ext, dvtt_icon_path, dvtt_prog_id, dvtt_file_type_desc, dvtt_perceived_type, true, false)
+	
 	}
-	if file_exists_ns(file_assoc_path) {
-		file_delete_ns(file_assoc_path);	
-	}
+	else
+	{
 	
-	//Check if program was opened with a save file
-	for (var i = 0; i < parameter_count(); i ++) { 
-		var param = parameter_string(i);
-		show_message(param);
-		if string_count(dm_file_ext, param) > 0 {
-			associated_file_path = param;
-			show_message(associated_file_path);
+		//Check if file association files exist and delete them as they are no longer needed
+		var game_path = program_directory;
+		var refresh_icons_path = game_path + "RefreshIcons.ps1";
+		var file_assoc_path = game_path + "file_assoc.bat";
+		if file_exists_ns(refresh_icons_path) {
+			file_delete_ns(refresh_icons_path);	
+		}
+		if file_exists_ns(file_assoc_path) {
+			file_delete_ns(file_assoc_path);	
+		}
+	
+		//Check if program was opened with a save file
+		for (var i = 0; i < parameter_count(); i ++) { 
+			var param = parameter_string(i);
+			show_message(param);
+			if string_count(dm_file_ext, param) > 0 {
+				associated_file_path = param;
+				show_message(associated_file_path);
+			}
 		}
 	}
+
+	//Trigger loading the associated file
+	if associated_file_path != undefined {
+		//oad_scene(associated_file_path);
+		associated_file_path = undefined;
+
+	}
 }
-
-//Trigger loading the associated file
-if associated_file_path != undefined {
-	load_scene(associated_file_path);
-	associated_file_path = undefined;
-
-}
-
+	
 #endregion

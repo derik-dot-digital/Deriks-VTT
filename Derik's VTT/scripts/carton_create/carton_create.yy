@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"carton_create",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"carton_create",
+  "parent":{
+    "name":"Carton",
+    "path":"folders/Carton.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

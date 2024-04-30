@@ -44,7 +44,49 @@ function cm_vbuff_plane() {
 	cm_add(cm, cm_triangle_ext(false, p2, p3, p4));
 	return [vb, cm];
 }
+
+//Pyramid
+function cm_vbuff_pyramid(origin_offset = new vec3(0, 0, 0)) {
+	var cm = cm_list();
+	var vb = vertex_create_buffer();
+	cm_vbuff_begin(vb);
+	var scale = 0.5;
+	var p1 = new vec3(-scale, -scale, 0).Add(origin_offset);
+	var p2 = new vec3(-scale, scale, 0).Add(origin_offset);
+	var p3 = new vec3(scale, -scale, 0).Add(origin_offset);
+	var p4 = new vec3(scale, scale, 0).Add(origin_offset);
+	var p5 = new vec3(0, 0, scale).Add(origin_offset);
+	var t =  [new vec2(0, 0), new vec2(0, 1), new vec2(1, 0), new vec2(1, 1)]
+	var c = c_white;
+	var a = 1;
+
+	//Flat Plane
+	var n1 = cm_vbuff_generate_tri_normals(p1, p2, p3);
+	var n2 = cm_vbuff_generate_tri_normals(p2, p3, p4);
+	cm_vbuff_add_tri(vb, p1, p2, p3, n1, t[0], t[1], t[2], c, c, c, a, a, a);
+	cm_vbuff_add_tri(vb, p2, p3, p4, n1, t[1], t[2], t[3], c, c, c, a, a, a);
 	
+	//Pyramid Sides
+	var n3 = cm_vbuff_generate_tri_normals(p1, p2, p5);
+	var n4 = cm_vbuff_generate_tri_normals(p2, p3, p5);
+	var n5 = cm_vbuff_generate_tri_normals(p3, p4, p5);
+	var n6 = cm_vbuff_generate_tri_normals(p4, p1, p5);
+	cm_vbuff_add_tri(vb, p1, p2, p5, n3, t[0], t[0], t[0], c, c, c, a, a, a);
+	cm_vbuff_add_tri(vb, p2, p3, p5, n4, t[0], t[0], t[0], c, c, c, a, a, a);
+	cm_vbuff_add_tri(vb, p3, p4, p5, n5, t[0], t[0], t[0], c, c, c, a, a, a);
+	cm_vbuff_add_tri(vb, p4, p1, p5, n6, t[0], t[0], t[0], c, c, c, a, a, a);
+	
+	cm_vbuff_end(vb);
+	cm_add(cm, cm_triangle_ext(false, p1, p2, p3));
+	cm_add(cm, cm_triangle_ext(false, p2, p3, p4));
+	cm_add(cm, cm_triangle_ext(false, p1, p2, p5));
+	cm_add(cm, cm_triangle_ext(false, p2, p3, p5));
+	cm_add(cm, cm_triangle_ext(false, p3, p4, p5));
+	cm_add(cm, cm_triangle_ext(false, p4, p1, p5));
+	
+	return [vb, cm];
+}
+
 function mouse_to_world_cast() {
 	var ww = win_w;
 	var wh = win_h;

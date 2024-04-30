@@ -96,6 +96,10 @@ asset_settings_open = false;
 right_click_open = false;
 create_asset_open = false;
 skybox_settings_open = false;
+walking_distance_open = false;
+
+//Menu Offsets
+walking_dist_offset = new vec2(0, 0);
 
 //Scene Creation 
 splash_offset = new vec2(0, 0);
@@ -123,6 +127,10 @@ asset_create_name = "New Asset";
 asset_create_filepath = "Copy file path here!";
 asset_create_extension = undefined;
 
+//Action Buttons
+teleport_hovered = false;
+walk_hovered = false;
+
 //Saving/Loading 
 zip_save_id = undefined;
 zip_save_status = undefined;
@@ -148,5 +156,26 @@ asset_axis_unlocked = new vec3(1, 1, 1);
 asset_pos_prev = new vec3(0, 0, 0);
 asset_quat_prev = new quat()
 asset_scale_prev = new vec3(1, 1, 1);
+
+//Screen to World Raycast
+stw_cast_pos = new vec3(0, 0, 0);
+stw_cast_success = false;
+
+//Teleport Indicator
+vbuff_teleport = cm_vbuff_pyramid()[0];
+vbuff_teleport_scale = new vec3(0, 0, 0);
+vbuff_pyramid_quat = new quat();
+teleport_pos = new vec3(0, 0, 0);
+stw_cast_norm = new vec3(0, 0, 0);
+
+//Walking 
+walk_target_pos = new vec3(0, 0, 0);
+walk_start_pos = new vec3(0, 0, 0);
+walk_steps = 0;
+
+//Look Direction
+vbuff_look_dir = cm_vbuff_pyramid()[0];
+vbuff_look_dir_quat = new quat();
+look_dir_hovered = false; 
 
 #endregion

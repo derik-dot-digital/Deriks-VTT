@@ -1,104 +1,3 @@
-#region README
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//								          		Gamemaker File Association						            //									
-////////////////////////////////////////////////////////////////////////////////////////////
-//		--------------------------------------------CREDITS------------------------------------------------
-//		Asset made by Derik.NET
-//		https://github.com/derik-dot-net
-//
-//		Inspired by Juju Adam's Furballs
-//		https://jujuadams.itch.io/furballs
-//
-//		Based on Microsoft's documention
-//		https://learn.microsoft.com/en-us/windows/win32/shell/fa-intro
-//
-//		-----------------------------------WHAT DOES THIS DO?------------------------------------
-//		This asset allows the developer to use Gamemaker to associate files
-//		such as save-files with their program. So that the end-user can then 
-//		click on the file to automatically open the program, which could then
-//		immediately load the save file if wanted. Furthmore this asset allows 
-//		an icon to be set for those files. 
-//
-//		It does this by defining your custom file extension in Windows just as
-//		programs such as Gamemaker or Blender do for .proj files and .blend
-//		files respectively. As part of this process it defines the file extension,
-//		the associated .exe file path, and the associated .ico file path. Once
-//		those changes are applied a script runs that forces a refresh for
-//		Window's icon cache so the changes are immediately viewable.
-//
-//		---------------------------------USE AT YOUR OWN RISK-----------------------------------
-//		This extensions edits the registry of the users windows installation to 
-//		associate a specified file extension with the program, and also allows
-//		for a custom icon to be specified for files with that extension.
-//
-//		Make sure the file extension and program name is one that will most-
-//		likely not ever be present on an end-users machine. Microsoft
-//		recommends checking this page:
-//		https://www.iana.org/assignments/media-types/media-types.xhtml
-//		I'd also recomend googling your file extension to verify its uniqueness.
-//
-//		Files that use the same extension will all become associated with your 
-//		program and if one is defined the icon for those files will also all change. 
-//		If this is used incorrectly, a user or end-user could experience major
-//		issues with their computer. Especially if an important file extension
-//		was modified using this code.
-//
-//		This is also not guarenteed to work, as I do not claim to be an expert
-//		on manipulating Windows or the the registry, but I did my best to 
-//		follow the instructions provided by Microsoft, as well as replicate the
-//		shared structure of other file extensions defined in the registry.
-//
-//		----------------------------------------REQUIREMENTS----------------------------------------
-//		This asset requires the following extension for Gamemaker to be
-//		included to the Gamemaker project in order for it to work.
-//
-//		execute_shell_simple for Gamemaker by YellowAfterLife
-//		https://yellowafterlife.itch.io/gamemaker-execute-shell-simple
-//		This extension is what allows this asset  to run the .bat file from
-//		within Gamemaker during runtime. 
-//
-//		---------------------------------------NOTES ON USAGE--------------------------------------
-//		This asset as provided does not do file association unless the game is
-//		compiled. This is because when you run your game inside of the IDE 
-//		while developing it within Gamemaker, it is run in special enviorment
-//		using Gamemaker's runner.exe, which unless compiled is what the 
-//		function program_pathname will return. If this wasn't the case your
-//		file extension could become associated with Gamemaker's runner.
-//
-//		I also DO NOT recommend putting the script call anywhere that it 
-//		could be run multiple times, you likely never would want to do that.
-//
-//		If your program is still early in the development or you are a new user 
-//		to gamemaker then this asset is NOT FOR YOU.
-//
-//		If you think its possible the file extension you plan to use may change
-//		then please read the USE AT YOUR OWN RISK section above. 
-//
-//		I would make sure that you are happy with both your file extension of
-//		choice, as well as your icon, because making multiple changes to the
-//		registry is probably not good practice.
-//
-//		If you want to view the changes made to the registry by this asset after
-//		it has been run, then press WIN + R and then type in regedit and press
-//		ok. This should open the Registry Editor, where you you should be able
-//		to find the added registry keys under HKEY_CLASSES_ROOT. If you need 
-//		to debug this is where you should look.
-//
-//		This asset  only accepts a file path to a valid .ico icon image.
-//		It is recommended that whatever image you are trying to use, you
-//		store it in the included files and determine the path programmatically
-//		rather than hardcoding it.
-//		for example: 
-//		var icon_path = working_directory + "icon_name.ico"; 
-//
-//		If you have an image and don't know how to convert it to an icon,
-//		I recommend using this website: https://convertico.com/
-//
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-#endregion
-
 /// @param {string} file_extension
 /// @param {string} icon_path
 /// @param {string} prog_id 
@@ -106,7 +5,11 @@
 /// @param {string} perceived_type
 /// @param {bool} force_refresh
 /// @param {bool} debug
-function gm_file_association(argument0, argument1, argument2, argument3, argument4, argument5 = false, argument6 = true)
+// Made by Derik.NET https://github.com/derik-dot-net
+// Inspired by JujuAdams Furballs 
+// Replicates standard practices for file association documented here:
+// https://learn.microsoft.com/en-us/windows/win32/shell/fa-intro
+function gm_file_association(argument0, argument1, argument2, argument3, argument4, argument5 = false, argument6 = false)
 {
 
 	//Store Arguments
@@ -114,13 +17,13 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 	var icon_path = argument1;
 	var prog_id = argument2;
 	var file_type_desc = argument3;
-	var perceived_type = argument4; //https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/cc144150(v=vs.85)
+	var perceived_type = argument4;
 	var force_refresh = argument5;
 	var debug = argument6;
 
 	//Make sure requirements are met
 	var requirements_met = true;
-	if requirements_met = true {
+	if requirements_met = true { //This is some basic error handling, will likely update in the future to check for more things that aren't supported
 
 		//Make sure input is a string
 		if !is_string(file_ext) or !is_string(icon_path) {
@@ -132,8 +35,8 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 		var file_ext_without_dot = string_replace(file_ext, ".", "");
 
 		//Ensures extensions are present
-		if !extension_exists("libfilesystem"){
-			show_message("GM Custom File Association failed. Missing FileManger extension.");	
+		if !extension_exists("nsfs"){
+			show_message("GM Custom File Association failed. Missing Non-Sandboxed File System extension.");	
 			requirements_met = false;
 		}
 		if !extension_exists("execute_shell_simple_ext")  {
@@ -172,9 +75,10 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 			show_message("GM Custom File Association failed; Not a valid icon file.");	
 			requirements_met = false;
 		}
+			
 	}
 	
-	//Checks if game has been compiled and is not being run from inside Gamemaker's IDE. (Debug mode forces it to run regardless of checks)
+	//If none of the error checks failed run script
 	if (requirements_met) {
 		
 		//Returns the .exe path
@@ -218,10 +122,7 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 			_ps1 += nl + @"";
 		
 			//Save Powershell Script
-			string_save_ns(_ps1, force_refresh_path);		
-			
-			//Saves to desktop for inspection (replace path with whatever you want, I was using an extension to get the desktop directory
-			//string_save_ns(_ps1, directory_get_desktop_path()+"generated_ps1.ps1");
+			string_save(force_refresh_path, _ps1);		
 			
 		}
 		
@@ -287,10 +188,7 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 		_bat += nl + @"pause";
 	
 	//Save Batch File
-	string_save_ns(_bat, file_assoc_path);
-	
-	//Saves to desktop for inspection (replace path with whatever you want, I was using an extension to get the desktop directory
-	//string_save_ns(_bat, directory_get_desktop_path()+"generated_bat.bat"); 
+	string_save(file_assoc_path, _bat);
 
 	//Run Generated files
 	var show_cmd = 0;
@@ -299,4 +197,18 @@ function gm_file_association(argument0, argument1, argument2, argument3, argumen
 	
 	}
 	
+}
+
+///@param filename
+///@param string
+//Credit to JujuAdam's as this was pulled from his Furballs Project
+function string_save(argument0, argument1) {
+	
+	var _name   = argument0;
+	var _string = argument1;
+	var _buffer = buffer_create( string_length( _string ), buffer_fixed, 1 );
+	buffer_write( _buffer, buffer_text, _string );
+	buffer_save( _buffer, _name );
+	buffer_delete( _buffer );
+
 }

@@ -334,7 +334,7 @@ function vec3(x = 0, y = 0, z = 0) constructor {
 		gml_pragma("forceinline");
 		return point_direction(0, 0, self.x, self.y);
 	}
-	
+
 	//Adds two vectors
 	static Add = function(val) {
 		gml_pragma("forceinline");
