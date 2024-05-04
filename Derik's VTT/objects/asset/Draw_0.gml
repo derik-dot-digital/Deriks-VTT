@@ -71,7 +71,7 @@ if type = asset_types.art or type = asset_types.map or type  = asset_types.playe
 #region Collision 
 
 //Debug Draw Collision Shape
-if (col_dynamic != undefined and draw_col_shape) or true {
+if (col_dynamic != undefined and draw_col_shape){
 	
 	//Set ColMesh Debug Shader
 	shader_set(sh_cm_debug);
@@ -91,16 +91,15 @@ if (col_dynamic != undefined and draw_col_shape) or true {
 if is_character and selected {
 	
 	//Pointer
-	facing_dir++;
 	var look_dir_pos = pos.Add(new vec3(lengthdir_x(art_w/1.5, facing_dir), lengthdir_y(art_h/1.5, facing_dir), 0));
 	vbuff_look_dir_quat = world_x.Quat().Mul(vbuff_look_dir_quat).Normalize();
 	vbuff_look_dir_quat = new quat().FromAngleAxis(-degtorad(facing_dir-90), world_up).Normalize().Mul(vbuff_look_dir_quat).Normalize();
 	vbuff_look_dir_scale = new vec3(0.5, 0.5, 1).Mul((art_w+art_h)/4);
 	
 	//Draw Arrow
-	matrix_set(matrix_world, vbuff_look_dir_quat.AsTransformMatrix(look_dir_pos, vbuff_look_dir_scale));
-	vertex_submit(camera.vbuff_look_dir, pr_trianglelist, -1);
-	matrix_set(matrix_world, mat_default);
+	//matrix_set(matrix_world, vbuff_look_dir_quat.AsTransformMatrix(look_dir_pos, vbuff_look_dir_scale));
+	//vertex_submit(camera.vbuff_look_dir, pr_trianglelist, -1);
+	//matrix_set(matrix_world, mat_default);
 		
 }
 

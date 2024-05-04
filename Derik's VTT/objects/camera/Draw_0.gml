@@ -143,6 +143,13 @@ if global.selection_action == asset_actions.walk {
     // Draw and clean up
     vertex_submit(vb, pr_linelist, -1);
     vertex_delete_buffer(vb);
+	
+	var tile_hs = grid.tile_size/2;
+	var teleport_vbuff_pos = walk_target_pos.Add(world_up.Mul(tile_hs));
+	var vbuff_pyramid_mat = vbuff_pyramid_quat.AsTransformMatrix(teleport_vbuff_pos, vbuff_teleport_scale);
+	matrix_set(matrix_world, vbuff_pyramid_mat);
+	vertex_submit(vbuff_teleport, pr_trianglelist, -1);
+	matrix_set(matrix_world, mat_default);
 }
 
 //Grid

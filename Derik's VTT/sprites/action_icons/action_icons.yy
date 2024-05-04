@@ -21,6 +21,7 @@
   "height":512,
   "HTile":false,
   "layers":[
+    {"$GMImageLayer":"","%Name":"53293772-54a5-4c21-bafe-d3b31604900c","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"53293772-54a5-4c21-bafe-d3b31604900c","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"4f0b763b-989a-45d8-8e79-4e6fa179ecc6","blendMode":0,"displayName":"default","isLocked":false,"name":"4f0b763b-989a-45d8-8e79-4e6fa179ecc6","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"action_icons",

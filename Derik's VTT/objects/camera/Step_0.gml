@@ -108,8 +108,15 @@ if global.selected_inst != noone and !ImGui.IsAnyItemFocused() {
 	
 	//Finish Action
 	if keyboard_check_released(vk_enter) or mouse_check_button(mb_left) {
-		if global.selection_action = asset_actions.teleport and stw_cast_success {
-			global.selected_inst.pos = teleport_pos;	
+		if global.selection_action = asset_actions.teleport {
+			if stw_cast_success {
+				global.selected_inst.pos = teleport_pos;	
+			}
+		}
+		if global.selection_action = asset_actions.walk {
+			if stw_cast_success {
+				global.selected_inst.pos = walk_target_pos;	
+			}
 		}
 		global.selection_action = asset_actions.idle;
 	
@@ -195,17 +202,27 @@ if global.selected_inst != noone  {
 	//Teleport
 	case (asset_actions.teleport):
 		var tile_hs = grid.tile_size/2;
-		var vbuff_pyramid_z = (tile_hs) * 4;
 		teleport_pos = stw_cast_pos.Snapped(new vec3(tile_hs, tile_hs, tile_hs)).Add(world_up.Mul(tile_hs));
+		
+		//Indicator
+		var vbuff_pyramid_z = (tile_hs) * 4;
 		var teleport_rot_quat = new quat().FromAngleAxis(0.1, world_up).Normalize();
 		vbuff_pyramid_quat = vbuff_pyramid_quat.Mul(teleport_rot_quat).Normalize();
 		vbuff_teleport_scale = new vec3(tile_hs / 2, tile_hs / 2, -vbuff_pyramid_z);
+		
 	break;
 	
 	//Walk
 	case (asset_actions.walk):
 		var tile_hs = grid.tile_size/2;
 		walk_target_pos = stw_cast_pos.Snapped(new vec3(tile_hs, tile_hs, tile_hs)).Add(world_up.Mul(tile_hs));
+		
+		//Indicator
+		var vbuff_pyramid_z = (tile_hs) * 4;
+		var teleport_rot_quat = new quat().FromAngleAxis(0.1, world_up).Normalize();
+		vbuff_pyramid_quat = vbuff_pyramid_quat.Mul(teleport_rot_quat).Normalize();
+		vbuff_teleport_scale = new vec3(tile_hs / 2, tile_hs / 2, -vbuff_pyramid_z);
+		
 	break;
 	
 	}
@@ -605,17 +622,9 @@ else  //Everything else
 				walk_start_pos = global.selected_inst.pos;
 			}
 			walk_hovered = ImGui.IsItemHovered();
-
-			//Walk
-			var walk_c = c_white; if walk_hovered {walk_c = hovered_color;};
-			if ImGui.ImageButton("walk", action_icons, 1, walk_c, 1, menubar_color, 1, button_width, button_height) {
-				global.selection_action = asset_actions.walk;
-				walk_start_pos = global.selected_inst.pos;
-			}
-			walk_hovered = ImGui.IsItemHovered();
 			
-			//Walk
-			var look_dir_c = c_white; if walk_hovered {look_dir_c = hovered_color;};
+			//Look Dir
+			var look_dir_c = c_white; if look_dir_hovered {look_dir_c = hovered_color;};
 			if ImGui.ImageButton("look_dir", action_icons, 2, look_dir_c, 1, menubar_color, 1, button_width, button_height) {
 				//global.selection_action = asset_actions.walk;
 			}
