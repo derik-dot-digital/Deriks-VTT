@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"gm_file_association",
   "isCompatibility":false,
   "isDnD":false,

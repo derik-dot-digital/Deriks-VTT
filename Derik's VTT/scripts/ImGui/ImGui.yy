@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"ImGui",
   "isCompatibility":false,
   "isDnD":false,

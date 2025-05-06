@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"cm_ray_get_y",
   "isCompatibility":false,
   "isDnD":false,

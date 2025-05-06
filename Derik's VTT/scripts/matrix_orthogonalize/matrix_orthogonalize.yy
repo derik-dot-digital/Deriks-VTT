@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"matrix_orthogonalize",
   "isCompatibility":false,
   "isDnD":false,

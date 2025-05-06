@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"cm_ray_get_hit_object",
   "isCompatibility":false,
   "isDnD":false,

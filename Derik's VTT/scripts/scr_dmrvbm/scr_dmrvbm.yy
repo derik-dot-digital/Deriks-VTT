@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"scr_dmrvbm",
   "isCompatibility":false,
   "isDnD":false,

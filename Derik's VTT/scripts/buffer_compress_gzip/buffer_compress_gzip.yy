@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"buffer_compress_gzip",
   "isCompatibility":false,
   "isDnD":false,

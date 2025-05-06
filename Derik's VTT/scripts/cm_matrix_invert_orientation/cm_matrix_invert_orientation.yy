@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"cm_matrix_invert_orientation",
   "isCompatibility":false,
   "isDnD":false,

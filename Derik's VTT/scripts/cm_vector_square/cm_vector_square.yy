@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"cm_vector_square",
   "isCompatibility":false,
   "isDnD":false,

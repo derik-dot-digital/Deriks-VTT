@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"cm_matrix_build_from_vector",
   "isCompatibility":false,
   "isDnD":false,

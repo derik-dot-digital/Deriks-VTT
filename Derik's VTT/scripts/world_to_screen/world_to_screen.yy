@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"world_to_screen",
   "isCompatibility":false,
   "isDnD":false,

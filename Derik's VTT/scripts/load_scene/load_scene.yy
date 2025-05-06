@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"load_scene",
   "isCompatibility":false,
   "isDnD":false,

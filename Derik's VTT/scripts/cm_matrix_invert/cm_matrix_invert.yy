@@ -1,5 +1,5 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"cm_matrix_invert",
   "isCompatibility":false,
   "isDnD":false,
